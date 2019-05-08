@@ -2,7 +2,7 @@
 name: Bug报告
 about: 提交你发现的Bug（包括crash）
 title: "#Bug#"
-labels: bug, new 新提交, task 任务
+labels: bug, major 一般, new 新提交
 assignees: ''
 
 ---
