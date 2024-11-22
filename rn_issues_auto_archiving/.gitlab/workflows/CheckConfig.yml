@@ -1,0 +1,18 @@
+
+check_config:
+  tags: 
+    - ubuntu
+  stage: check_config
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "push"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+  image: m.daocloud.io/docker.io/library/python:3.10.13-slim-bullseye
+  script: |
+    cd $WORK_DIRECTORY
+    python ./src/utils/check_config.py --config-dir "./config/"
