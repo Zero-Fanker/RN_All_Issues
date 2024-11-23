@@ -45,7 +45,7 @@ on:
           - 设定调整
 
 env:
-  ARCHIVED_DOCUMENT_PATH: "./修改归档"
+  ARCHIVED_DOCUMENT_PATH: "./修改归档.md"
   TARGET_BRANCH: master
   ISSUE_OUTPUT_PATH: "./output.json"
   ISSUE_REPOSITORY: "外部Issue"
