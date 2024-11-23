@@ -1,0 +1,56 @@
+
+concurrency:
+  group: archiving-group
+
+name: Deploy auto archiving script
+run-name: Deploy auto archiving script
+
+on:
+  repository_dispatch: 
+    types: [deploy]
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 手动触发部署流水线的原因：
+        required: true
+        default: "deploy auto archiving script manually"
+
+
+permissions:
+  contents: write
+
+env:
+  AUTO_ARCHIVING_SCRIPT_ARCHIVE_URL : "https://github.com/revengenowstudio/rn_issues_auto_archiving/archive/refs/heads/main.zip"
+  COMMIT_MESSAGE: ${{ github.event.inputs.commit_message }}${{ github.event.client_payload.commit_message }}
+
+jobs:
+  deploy:
+    name: Deploy auto archiving script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Pull auto archiving script
+        run: |
+          apt install wget unzip jq -y
+          wget $AUTO_ARCHIVING_SCRIPT_ARCHIVE_URL
+          unzip main.zip
+          mv -frv rn_issues_auto_archiving-main/config ./config
+          mv -frv rn_issues_auto_archiving-main/.github ./.github
+          mv -frv rn_issues_auto_archiving-main/rn_issue_auto_archiving ./rn_issue_auto_archiving
+
+      - name: Push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          diff=$(git diff --cached)
+          if [[ -z $diff ]]; then
+              echo "no file changes"
+          else
+              echo "some file changes , pushing changes"
+              git commit -m "${{ env.COMMIT_MESSAGE }}"
+              git push origin master
+          fi
+
