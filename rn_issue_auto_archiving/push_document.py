@@ -134,7 +134,7 @@ def main():
             gitlab_host,
             project_id,
             archived_document_path,
-            os.environ["branch"]
+            os.environ[Env.TARGET_BRANCH]
         )
         if should_no_change(local_sha256, remote_sha256):
             print(Log.not_need_to_push_document
