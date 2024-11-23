@@ -150,7 +150,7 @@ def main():
             project_id,
             archived_document_path,
             Path(archived_document_path).read_text("utf-8"),
-            os.environ["branch"],
+            os.environ[Env.TARGET_BRANCH],
             os.environ["author_email"],
             os.environ["author_name"],
             os.environ["commit_message"].format(

@@ -36,6 +36,7 @@ class Env():
     ISSUE_NUMBER = "ISSUE_NUMBER"
     ISSUE_TITLE = "ISSUE_TITLE"
     ISSUE_TYPE = "ISSUE_TYPE"
+    TARGET_BRANCH = "TARGET_BRANCH"
     
 
 def should_run_in_github_action() -> bool:
