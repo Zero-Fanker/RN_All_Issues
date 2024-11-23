@@ -1,0 +1,13 @@
+{
+    "rjust_space_width": 60,
+    "rjust_character": " ",
+    "table_separator": "|",
+    "archive_template": "|{table_id}|({issue_type}){issue_title}{rjust_space}[{issue_repository}#{issue_id}] |{introduced_version}|{archive_version}|",
+    "issue_title_processing_rules": {
+        "Bug修复": {
+            "add_prefix": "修复了",
+            "add_suffix": "的Bug",
+            "remove_keyword": []
+        }
+    }
+}
