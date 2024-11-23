@@ -1,0 +1,37 @@
+
+name: Check JSON config files
+run-name: "Check JSON config files"
+
+# 在拉取请求合并时运行 pull_request 工作流
+# https://docs.github.com/zh/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#running-your-pull_request-workflow-when-a-pull-request-merges
+on: 
+  push: 
+    branches: 
+      - main
+    paths: 
+      - '**.json'
+  pull_request:
+    branches: 
+      - main
+    paths: 
+      - '**.json'
+
+env:
+  WORK_DIRECTORY: "."
+
+jobs:
+  check_config:
+    runs-on:  ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python and install dependencies
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      
+      - name: Check config files
+        run: |
+          cd ${{ env.WORK_DIRECTORY }}
+          python ./src/utils/check_config.py --config-dir "./config"

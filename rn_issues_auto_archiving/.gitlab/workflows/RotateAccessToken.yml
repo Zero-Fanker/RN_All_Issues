@@ -1,0 +1,28 @@
+# rotate仓库token，文档：
+# https://docs.gitlab.com/ee/api/project_access_tokens.html#rotate-a-project-access-token
+
+# token权限文档：
+# https://docs.gitlab.com/17.3/ee/user/project/settings/project_access_tokens.html#scopes-for-a-project-access-token
+
+# 流水线调度器（schedules）文档：
+# https://docs.gitlab.com/ee/ci/pipelines/schedules.html#edit-a-pipeline-schedule
+
+
+
+variables:
+  GITLAB_HOST: $CI_SERVER_HOST       # example: gitlab.com
+  PROJECT_ID: $CI_PROJECT_ID         # example: 123456  
+  TOKEN_TTL_DAYS: 93                 # 单位：天
+  TARGET_VARIABLE_NAME: TOKEN
+
+rotate_access_token:
+  tags: 
+    - ubuntu
+  stage: rotate_access_token
+  only:
+    - schedules
+  script: |
+    cd $WORK_DIRECTORY
+    pip install -r ./src/issue_processor/requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+    python ./src/utils/rotate_access_token.py
+  
