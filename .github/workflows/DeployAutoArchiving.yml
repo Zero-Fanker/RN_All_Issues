@@ -1,6 +1,6 @@
 
 concurrency:
-  group: archiving-group
+  group: deploy-group
 
 name: Deploy auto archiving script
 run-name: Deploy auto archiving script
