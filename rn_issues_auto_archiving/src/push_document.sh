@@ -7,5 +7,5 @@ if [[ -z $diff ]]; then
 else
     echo "归档文档发生了变化，执行提交流程"
     git commit -m "$COMMIT_TITLE$ISSUE_NUMBER$MANUAL_ISSUE_NUMBER"
-    git push origin main
+    git push origin master
 fi
