@@ -1,8 +1,0 @@
-repos:
-  - repo: local
-    hooks:
-      - id: check-json
-        name: Check JSON files
-        entry: python .pre-commit/check_json.py
-        language: python
-        types: [json]
