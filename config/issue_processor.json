@@ -29,14 +29,14 @@
             "#AI相关#": "设定调整",
             "#计划研讨#": "设定调整",
             "#工具需求#": "设定调整"
-
         },
         "need_introduced_version_issue_type": [
             "Bug修复"
         ],
         "label_map": {
             "bug": "Bug修复",
-            "enhancement 优化或建议": "设定调整"
+            "enhancement 优化或建议": "设定调整",
+            "task 任务": "设定引入"
         }
     },
     "white_list": {
