@@ -18,9 +18,11 @@ on:
 
 permissions:
   contents: write
+  
 
 env:
   AUTO_ARCHIVING_SCRIPT_ARCHIVE_URL : "https://github.com/revengenowstudio/rn_issues_auto_archiving/archive/refs/heads/main.zip"
+  AUTO_ARCHIVING_YML_PATH: "./.github/workflows/AutoArchiving.yml"
   COMMIT_MESSAGE: ${{ github.event.inputs.commit_message }}${{ github.event.client_payload.commit_message }}
 
 jobs:
@@ -30,22 +32,27 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
 
       - name: Pull auto archiving script
+      # github action 的GITHUB_TOKEN是不提供workflows权限的，所以没法使用GITHUB_TOKEN自动部署流水线yml
         run: |
-          sudo apt-get update
-          sudo apt-get install unzip jq -y
           wget $AUTO_ARCHIVING_SCRIPT_ARCHIVE_URL
-          unzip main.zip
-          mv -frv rn_issues_auto_archiving-main/config ./config
-          mv -frv rn_issues_auto_archiving-main/.github ./.github
-          mv -frv rn_issues_auto_archiving-main/rn_issue_auto_archiving ./rn_issue_auto_archiving
+          unzip -q main.zip
+          cp -rfv ./rn_issues_auto_archiving-main/config ./
+          cp -rfv ./rn_issues_auto_archiving-main/rn_issue_auto_archiving ./
+          content=$(<"$AUTO_ARCHIVING_YML_PATH")
+          updated_content=$(echo "$content" | sed 's/TARGET_BRANCH:[[:space:]]*main/TARGET_BRANCH: master/g')
+          echo "$updated_content" >"$AUTO_ARCHIVING_YML_PATH"
+          rm -rf ./rn_issues_auto_archiving-main
+          rm -f ./main.zip
 
       - name: Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
+          git add ./config
+          git add ./rn_issue_auto_archiving
           diff=$(git diff --cached)
           if [[ -z $diff ]]; then
               echo "no file changes"
