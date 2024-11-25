@@ -30,4 +30,4 @@ jobs:
       
       - name: Check config files
         run: |
-          python ./rn_issue_auto_archiving/utils/check_config.py --config-dir "./config"
+          python ./rn_issues_auto_archiving/utils/check_config.py --config-dir "./config"

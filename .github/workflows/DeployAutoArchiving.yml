@@ -40,7 +40,7 @@ jobs:
           wget $AUTO_ARCHIVING_SCRIPT_ARCHIVE_URL
           unzip -q main.zip
           cp -rfv ./rn_issues_auto_archiving-main/config ./
-          cp -rfv ./rn_issues_auto_archiving-main/rn_issue_auto_archiving ./
+          cp -rfv ./rn_issues_auto_archiving-main/rn_issues_auto_archiving ./
           content=$(<"$AUTO_ARCHIVING_YML_PATH")
           updated_content=$(echo "$content" | sed 's/TARGET_BRANCH:[[:space:]]*main/TARGET_BRANCH: master/g')
           echo "$updated_content" >"$AUTO_ARCHIVING_YML_PATH"
@@ -52,7 +52,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add ./config
-          git add ./rn_issue_auto_archiving
+          git add ./rn_issues_auto_archiving
           diff=$(git diff --cached)
           if [[ -z $diff ]]; then
               echo "no file changes"

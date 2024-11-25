@@ -69,8 +69,8 @@ jobs:
           python-version: "3.10"
           cache: 'pip' # caching pip dependencies
       - run: |
-          pip install -r ./rn_issue_auto_archiving/issue_processor/requirements.txt
-          pip install -r ./rn_issue_auto_archiving/auto_archiving/requirements.txt
+          pip install -r ./rn_issues_auto_archiving/issue_processor/requirements.txt
+          pip install -r ./rn_issues_auto_archiving/auto_archiving/requirements.txt
   
       - name: Processing issue content
         env:
@@ -90,15 +90,15 @@ jobs:
           MANUAL_ISSUE_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.inputs.issue_number }}"
           MANUAL_COMMENTS_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.inputs.issue_number }}/comments"
         run: |
-          python ./rn_issue_auto_archiving/issue_processor_main.py --config "./config/issue_processor.json"
+          python ./rn_issues_auto_archiving/issue_processor_main.py --config "./config/issue_processor.json"
 
       - name: Archiving closed issues
         run: |
-          python ./rn_issue_auto_archiving/auto_archiving_main.py --config "./config/auto_archiving.json" --failed-record "./归档失败记录.json"
+          python ./rn_issues_auto_archiving/auto_archiving_main.py --config "./config/auto_archiving.json" --failed-record "./归档失败记录.json"
           
       - name: Add and commit changes
         run: |
-          bash ./rn_issue_auto_archiving/push_document.sh
+          bash ./rn_issues_auto_archiving/push_document.sh
           
 
 
