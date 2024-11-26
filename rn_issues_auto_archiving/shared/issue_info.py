@@ -19,6 +19,7 @@ class IssueInfoJson(TypedDict):
     introduced_version: str
     archive_version: str
     ci_event_type: str
+    platform_type: str
     reopen_info: ReopenInfo
     
     
@@ -47,6 +48,7 @@ class IssueInfo():
     '''值只可能为 open 或 closed'''
     introduced_version: str
     archive_version: str
-    ci_event_type:str
+    ci_event_type:str         
+    platform_type: str
     reopen_info: ReopenInfo
     

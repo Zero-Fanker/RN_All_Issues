@@ -105,11 +105,8 @@ def main():
                 issue_info.ci_event_type in CiEventType.manual
             )
         )
-
-        comment_message = Log.issue_archived_success.format(
-            issue_id=issue_info.issue_id,
-            issue_repository=issue_repository
-        )
+        # 由于后续还有push步骤，发送归档成功的评论不能在这里完成了
+        enable_send_comment = False
     except Exception as exc:
         exceptions.append(exc)
         comment_message = ErrorMessage.archiving_failed.format(
@@ -160,7 +157,6 @@ def main():
                     comment_url=issue_info.reopen_info.comment_url,
                     message=comment_message
                 )
-
             except Exception as exc_:
                 exceptions.append(exc_)
                 print(ErrorMessage.send_comment_failed

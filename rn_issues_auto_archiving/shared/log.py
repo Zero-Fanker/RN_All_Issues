@@ -48,6 +48,8 @@ class Log():
     running_ci_by_automated = '''流水线触发触发方式：自动'''
     http_404_not_found = '''无法请求到对应资源，请检查输入的Issue单号是否正确'''
     http_status_error = '''HTTP请求返回状态码错误，原因：{reason}'''
+    issue_type_webhook_detected = '''检测到流水线是由Issue类型webhook触发'''
+    other_type_webhook_detected = '''检测到流水线是由非Issue类型webhook触发，无需执行归档流程'''
     job_done = '''脚本执行完毕'''
     
     getting_something_success = '''获取 {something} 成功'''
@@ -109,3 +111,7 @@ class Log():
     need_to_push_document = '''本地文件 {file_path} 的sha256值与远程仓库文件 {file_path} 的sha256值不一致，执行推送流程'''
     get_local_file_sha256 = '''正在获取本地文件 {file_path} 的sha256值'''
     get_local_file_sha256_success = '''成功获取本地文件 {file_path} 的sha256值：{sha256}'''
+
+    # archiving_success
+    unknown_platform_type = '''未识别的平台类型 "{platform_type}"'''
+    send_comment_failed = '''发送评论失败，原因：{exc}'''

@@ -99,6 +99,10 @@ jobs:
       - name: Add and commit changes
         run: |
           bash ./rn_issues_auto_archiving/push_document.sh
+
+      - name: Send archiving success comment
+        run: |
+          python ./rn_issues_auto_archiving/archiving_success.py
           
 
 

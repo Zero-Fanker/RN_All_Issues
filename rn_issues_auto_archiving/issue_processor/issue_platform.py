@@ -60,7 +60,6 @@ class PlatformEnvironments():
 
 
 class Platform(ABC):
-
     @staticmethod
     def issue_number_to_int(issue_number: str):
         if not issue_number.isdigit():
@@ -182,6 +181,7 @@ class Platform(ABC):
         self._http_header: dict[str, str]
         self._http_client: httpx.Client
         self._ci_event_type: str
+        self._platform_type: str
 
     def http_request(
         self,
@@ -452,6 +452,7 @@ class Platform(ABC):
             introduced_version=introduced_version,
             archive_version=archive_version,
             ci_event_type=self._ci_event_type,
+            platform_type=self._platform_type,
             reopen_info=IssueInfoJson.ReopenInfo(
                 http_header=self._http_header,
                 reopen_url=self._urls.issue_url,
@@ -485,6 +486,7 @@ class Platform(ABC):
 
 
 class Github(Platform):
+    name = "github"
 
     @staticmethod
     def create_http_header(token: str) -> dict[str, str]:
@@ -586,6 +588,7 @@ class Github(Platform):
 
     def __init__(self):
         super().__init__()
+        self._platform_type = Github.name
         self._read_platform_environments()
         self._init_http_client()
 
@@ -671,6 +674,29 @@ class Github(Platform):
 
 
 class Gitlab(Platform):
+    name = "gitlab"
+
+    @staticmethod
+    def should_issue_type_webhook() -> bool:
+        '''Gitlab流水线通过webhook触发流水线，
+        且无法在流水线测区分webhook事件，
+        可能会遇到非Issue事件触发的webhook触发了自动归档流水线
+        （例如push事件webhook触发的自动部署流水线）
+        gitlab webhook事件类型详见：
+        https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#push-events
+        '''
+        try:
+            webhook_payload = json.loads(
+                os.environ[Env.WEBHOOK_PAYLOAD])
+            if webhook_payload["event_name"] == "issue":
+                print(Log.issue_type_webhook_detected)
+                return True
+            else:
+                print(Log.other_type_webhook_detected)
+                return False
+        except KeyError:
+            # 如果读取不到环境变量，说明是github流水线环境
+            return True
 
     @staticmethod
     def create_http_header(token: str) -> dict[str, str]:
@@ -817,6 +843,7 @@ class Gitlab(Platform):
 
     def __init__(self):
         super().__init__()
+        self._platform_type = Gitlab.name
         self._read_platform_environments()
         self._init_http_client()
 

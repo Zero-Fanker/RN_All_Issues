@@ -15,7 +15,6 @@ from auto_archiving.reopen_issue import reopen_issue
 from auto_archiving.http_request import http_request
 from issue_processor.issue_platform import Gitlab
 from shared.issue_info import IssueInfoJson
-from shared.issue_state import IssueState
 
 
 def get_issue_id_from_issue_info(webhook_path: str) -> int:
