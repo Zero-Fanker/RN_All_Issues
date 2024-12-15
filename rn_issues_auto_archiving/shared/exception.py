@@ -11,8 +11,13 @@ class ErrorMessage():
     missing_archive_version = '''Issue评论中找不到归档版本号关键字，请确保Issue评论中归档关键字格式正确且包含归档版本号。补全必要信息后请再次关闭Issue重新触发归档流程。
     归档关键字格式有：["x.xx.xxx测试通过","已验证，版本号:xxx"]
     '''
+
     too_many_archive_version = '''Issue评论中匹配到多个版本号关键字，请确保Issue评论中归档关键字格式正确且只包含一个格式的归档关键字。补全必要信息后请再次关闭Issue重新触发归档流程。
     匹配到的版本号有：{versions}
+    '''
+
+    too_many_issue_type = '''Issue标签中匹配到多个Issue类型标签，请确保Issue标签中只包含一个格式的Issue类型标签。请移除多余的Issue类型标签后再次关闭Issue重新触发归档流程。
+    匹配到的Issue类型标签有：{labels}
     '''
 
     missing_archive_labels = '''Issue标签中找不到归档所需标签，请给Issue打上归档所需标签。补全必要信息后请再次关闭Issue重新触发归档流程。
@@ -37,11 +42,11 @@ class ErrorMessage():
 
     reopen_issue_failed = '''Reopen Issue失败，错误信息：{exc}。
     '''
-    
+
     send_comment_failed = '''发送告警评论失败，错误信息：{exc}。
     '''
 
-    load_issue_info_failed = '''读取 {output_path} 失败，无法回溯Issue状态和记录失败内容，请检查相关代码，错误信息：{exc}'''
+    load_issue_info_failed = '''读取 {issue_output_path} 失败，无法回溯Issue状态和记录失败内容，请检查相关代码，错误信息：{exc}'''
 
     aggregation_error = '''抛出聚合错误：'''
 
@@ -75,17 +80,26 @@ class InBlackList(ArchiveBaseError):
     '''匹配到无法继续执行归档任务的黑名单内容'''
     pass
 
+
 class MissingArchiveVersionAndArchiveLabel(ArchiveBaseError):
     '''Issue Archive Version和关键的归档标签都缺失'''
     pass
+
 
 class WebhookPayloadError(Exception):
     '''webhook payload为空'''
     pass
 
+
 class IssueInfoMissing(Exception):
     '''找不到IssueInfo文件'''
-    
+
+
 class MissingIssueNumber(Exception):
     '''Issue Number为空'''
+    pass
+
+
+class UnexpectedPlatform(Exception):
+    '''未识别的流水线环境'''
     pass

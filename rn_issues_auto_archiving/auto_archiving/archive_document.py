@@ -1,30 +1,43 @@
-from io import TextIOWrapper
-
-from .json_config import IssueType, ConfigJson
+from shared.json_config import IssueType, ProcessingActionJson
 from shared.log import Log
 
 
 class ArchiveDocument():
-    def __init__(self, path: str):
+    def __init__(self):
+        self.__path: str
+        self.__lines: list[str] = []
+        self.__new_lines: list[str] = []
+        self.__reverse_lines: list[str] = []
+        self.__lines_set: set[str] = set()
+
+    def file_load(self, path: str):
         print(Log.getting_something_from
               .format(another=path,
                       something=Log.archive_document_content))
         self.__path = path
         with open(path, 'r', encoding="utf-8") as file:
             self.__lines = file.readlines()
-            self.__new_lines: list[str] = []
             self.__reverse_lines = self.__lines[::-1]
             self.__lines_set = set(self.__lines)
         print(Log.getting_something_from_success
               .format(another=path,
                       something=Log.archive_document_content))
-        self.__file: TextIOWrapper | None = None
+
+    def show_new_line(self) -> list[str]:
+        return self.__new_lines.copy()
+
+    def show_lines(self) -> list[str]:
+        return self.__lines.copy()
+
+    def add_new_line(self, line: str) -> None:
+        '''不建议直接使用此方法，建议使用archive_issue来格式化issue内容'''
+        self.__add_line(line)
 
     def __add_line(self, line: str) -> None:
         print(Log.add_new_line)
         self.__new_lines.append(line)
 
-    def __replace_line(self, index: str, line: str) -> None:
+    def __replace_line(self, index: int, line: str) -> None:
         print(Log.replaced_line_index
               .format(line_index=index,
                       ))
@@ -71,11 +84,13 @@ class ArchiveDocument():
         )
 
     @staticmethod
-    def parse_issue_title(
+    def __parse_issue_title(
         issue_title: str,
         issue_type: str,
-        issue_title_processing_rules: dict[IssueType,
-                                           ConfigJson.ProcessingAction]
+        issue_title_processing_rules: dict[
+            IssueType,
+            ProcessingActionJson
+        ]
     ) -> str:
         action_map = issue_title_processing_rules.get(
             issue_type)
@@ -84,7 +99,7 @@ class ArchiveDocument():
         else:
             result = issue_title
             for keyword in action_map["remove_keyword"]:
-                result.replace(keyword, '')
+                result = result.replace(keyword, '')
             result = ''.join(
                 [action_map["add_prefix"],
                  result,
@@ -92,10 +107,10 @@ class ArchiveDocument():
             )
             return result
 
-    def should_issue_archived(
+    def should_issue_record_exists(
         self,
+        issue_repository: str,
         issue_id: int,
-        issue_repository: str
     ) -> bool:
         sub_string = f'{issue_repository}#{issue_id}]'
         for line in self.__lines_set:
@@ -146,12 +161,16 @@ class ArchiveDocument():
                       rjust_character: str,
                       table_separator: str,
                       archive_template: str,
-                      issue_title_processing_rules: dict[IssueType,
-                                                         ConfigJson.ProcessingAction],
+                      fill_issue_url_by_repository_type: list[str],
+                      issue_title_processing_rules: dict[
+                          IssueType,
+                          ProcessingActionJson
+                      ],
                       issue_id: int,
                       issue_type: str,
                       issue_title: str,
                       issue_repository: str,
+                      issue_url: str,
                       introduced_version: str,
                       archive_version: str,
                       replace_mode: bool = False,
@@ -180,10 +199,16 @@ class ArchiveDocument():
             table_id = self.__get_last_table_number(
                 table_separator) + 1
 
+        issue_url_parents = ""
+        if issue_repository in fill_issue_url_by_repository_type:
+            issue_url_parents = f'({issue_url})'
+        else:
+            issue_url = ""
+
         new_content = archive_template.format(
             table_id=table_id,
             issue_type=issue_type,
-            issue_title=ArchiveDocument.parse_issue_title(
+            issue_title=self.__parse_issue_title(
                 issue_title,
                 issue_type,
                 issue_title_processing_rules
@@ -193,11 +218,13 @@ class ArchiveDocument():
                          * rjust_character),
             issue_repository=issue_repository,
             issue_id=issue_id,
+            issue_url=issue_url,
+            issue_url_parents=issue_url_parents,
             introduced_version=introduced_version,
             archive_version=archive_version
         )
         print(Log.format_issue_content_success)
-        
+
         if "\n" not in new_content:
             new_content += "\n"
 
@@ -209,28 +236,15 @@ class ArchiveDocument():
         else:
             self.__add_line(new_content)
 
-
     def save(self) -> None:
         print(Log.write_content_to_document)
         if not self.__lines[-1].endswith('\n'):
             self.__lines[-1] += "\n"
-        # 不能解包一个空列表
-        # 因为这是Python而不是C语言（x）
-        # 其实是因为解包空列表会导致没有实际参数传给函数
         if len(self.__new_lines) != 0:
             self.__lines.insert(
                 self.__get_table_last_line_index() + 1,
                 *self.__new_lines
             )
-        self.__file = open(
-            self.__path,
-            'w',
-            encoding="utf-8"
-        )
-        self.__file.writelines(
-            self.__lines
-        )
+        with open(self.__path, 'w', encoding="utf-8") as file:
+            file.writelines(self.__lines)
         print(Log.write_content_to_document_success)
-
-    def close(self) -> None:
-        self.__file.close()

@@ -1,7 +1,5 @@
-import httpx
-
 from shared.log import Log
-from auto_archiving.http_request import http_request
+from shared.http_request import http_request
 
 
 def reopen_issue(
