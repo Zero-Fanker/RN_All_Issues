@@ -13,11 +13,14 @@ class Log():
     issue_label = "Issue标签"
     dispatch_request = "工作流调度请求"
     uninitialized_message = "未初始化的信息"
+    unknown = "Unknown"
 
     getting_something = '''获取 {something} 中'''
     getting_something_from = '''正在从 {another} 中获取 {something}'''
     parse_something = '''处理 {something} 中'''
     loading_something = '''加载 {something} 中'''
+    config_path_not_found = '''未在命令行参数中获取到配置文件路径，请正确使用"-c"或"--config"参数传入配置文件路径'''
+    parse_config_failed = '''读取配置相关内容时发生错误，错误信息 ： {exc}'''
     getting_issue_info = '''正在请求并获取Issue相关信息'''
     non_platform_action_env = '''未检测到流水线环境，将读取".env"文件'''
     get_test_platform_type = '''从命令行参数中读取到测试平台类型，将执行 {test_platform_type} 平台流程'''
@@ -30,6 +33,7 @@ class Log():
     target_labels_not_found = '''未在 Issue 中找到 归档所需标签'''
     too_many_introduced_version = '''匹配到多个引入版本号'''
     too_many_archive_version = '''匹配到多个 归档关键字/归档版本号'''
+    too_many_issue_type = '''匹配到多个Issue类型标签：{labels}'''
     issue_type_not_found = '''未在 Issue标题 中找到 Issue类型关键字'''
     not_archive_issue = '''未满足归档Issue条件，不对此Issue进行归档处理'''
     print_input_variables = '''打印输入信息 ： {input_variables}'''
@@ -38,7 +42,7 @@ class Log():
     issue_state_is_open = '''Issue状态为“Open”，此issue不是归档对象'''
     issue_state_is_update = '''Issue状态为“update”，此issue不是归档对象'''
     webhook_payload_not_found = '''webhook payload为空，无法进行后续操作'''
-    save_issue_content_to_file = '''正在将Issue内容写入至 {output_path} '''
+    save_issue_content_to_file = '''正在将Issue内容写入至 {issue_output_path} '''
     unexpected_platform_type = '''未知的Issue平台类型 "{platform_type}"，请检查命令行参数输入和环境变量'''
     issue_already_archived = '''{issue_repository}#{issue_id} 已存在归档记录，无需再次归档，跳过归档流程'''
     issue_output_not_found = '''未找到格式化的issue信息文件，跳过归档写入流程'''
@@ -63,7 +67,7 @@ class Log():
     archive_version_found = '''成功匹配评论中的 归档关键字/归档版本号'''
     target_labels_found = '''成功匹配 Issue 中的 归档所需标签'''
     issue_type_found = '''成功在 Issue标题 中找到 Issue类型关键字'''
-    save_issue_content_to_file_success = "成功将 Issue内容 写入至 {output_path}"
+    save_issue_content_to_file_success = "成功将 Issue内容 写入至 {issue_output_path}"
     
     # auto_archiving
     archive_document_content = '''归档文件内容'''

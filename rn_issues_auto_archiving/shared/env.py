@@ -50,3 +50,5 @@ def should_run_in_gitlab_ci() -> bool:
 def should_run_in_local() -> bool:
     return (not should_run_in_github_action()
             and not should_run_in_gitlab_ci())
+    
+    
