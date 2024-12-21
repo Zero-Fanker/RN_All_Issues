@@ -47,9 +47,10 @@ on:
 env:
   ARCHIVED_DOCUMENT_PATH: "./修改归档.md"
   TARGET_BRANCH: master
-  ISSUE_OUTPUT_PATH: "./output.json"
+  ISSUE_OUTPUT_PATH: "./issue_info.json"
   ISSUE_REPOSITORY: "外部Issue"
   COMMIT_TITLE: "Closed 外部Issue#"
+  TOKEN: ${{ secrets.GITHUB_TOKEN }}
   CI_EVENT_TYPE: ${{ github.event_name }} 
   # 具体有什么事件类型：https://docs.github.com/zh/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#about-events-that-trigger-workflows
   ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -74,7 +75,6 @@ jobs:
   
       - name: Processing issue content
         env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # 自动流水线变量
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_STATE: ${{ github.event.issue.state }}
@@ -90,11 +90,7 @@ jobs:
           MANUAL_ISSUE_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.inputs.issue_number }}"
           MANUAL_COMMENTS_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.inputs.issue_number }}/comments"
         run: |
-          python ./rn_issues_auto_archiving/issue_processor_main.py --config "./config/issue_processor.json"
-
-      - name: Archiving closed issues
-        run: |
-          python ./rn_issues_auto_archiving/auto_archiving_main.py --config "./config/auto_archiving.json" --failed-record "./归档失败记录.json"
+          python ./rn_issues_auto_archiving/main.py --config "./config/auto_archiving.json"
           
       - name: Add and commit changes
         run: |

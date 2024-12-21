@@ -10,10 +10,10 @@ import httpx
 from shared.env import Env
 from shared.log import Log
 from shared.exception import ErrorMessage
-from auto_archiving.send_comment import send_comment
-from auto_archiving.reopen_issue import reopen_issue
-from auto_archiving.http_request import http_request
-from issue_processor.issue_platform import Gitlab
+from shared.send_comment import send_comment
+from shared.reopen_issue import reopen_issue
+from shared.http_request import http_request
+from issue_processor.git_service_client import GitlabClient
 from shared.issue_info import IssueInfoJson
 
 
@@ -121,7 +121,7 @@ def main():
     gitlab_host = os.environ[Env.GITLAB_HOST]
     project_id = int(os.environ[Env.PROJECT_ID])
     token = os.environ[Env.TOKEN]
-    http_header = Gitlab.create_http_header(token)
+    http_header = GitlabClient.create_http_header(token)
 
     try:
 
