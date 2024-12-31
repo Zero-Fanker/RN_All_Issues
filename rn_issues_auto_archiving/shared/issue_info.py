@@ -142,6 +142,10 @@ class IssueInfo():
         introduced_versions = [item.strip() for item in introduced_versions]
         if len(introduced_versions) >= 2:
             print(Log.too_many_introduced_version)
+            print(Log.matched_introduced_versions
+                  .format(
+                      versions=introduced_versions
+                  ))
             raise IntroducedVersionError(
                 ErrorMessage.too_many_introduced_version
                 .format(versions=[i for i in introduced_versions])
@@ -179,6 +183,10 @@ class IssueInfo():
                     archive_version_list.extend(match_result)
         if len(archive_version_list) >= 2:
             print(Log.too_many_archive_version)
+            print(Log.matched_archive_versions
+                  .format(
+                      versions=archive_version_list
+                  ))
             raise ArchiveVersionError(
                 ErrorMessage.too_many_archive_version
                 .format(versions=[i for i in archive_version_list])
@@ -211,6 +219,10 @@ class IssueInfo():
             )
         if len(result) > 1:
             print(Log.too_many_issue_type)
+            print(Log.matched_issue_type
+                  .format(
+                      issue_type=result
+                  ))
             raise IssueTypeError(
                 ErrorMessage.too_many_issue_type
                 .format(labels=result)
