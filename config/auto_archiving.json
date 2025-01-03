@@ -46,6 +46,9 @@
         "{version_regex}测试通过",
         "已验证[,，]版本号[:：]{version_regex}"
     ],
+    "skip_archived_reges_for_comments": [
+        "跳过归档流程"
+    ],
     "archived_document": {
         "rjust_space_width": 60,
         "rjust_character": " ",

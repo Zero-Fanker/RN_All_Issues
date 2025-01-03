@@ -64,6 +64,17 @@ def main() -> None:
 
     try:
         platform.enrich_missing_issue_info(issue_info)
+        
+        if IssueProcessor.should_skip_archived_process(
+            issue_info, 
+            config.skip_archived_reges_for_comments
+        ):
+            print(Log.manually_skip_archived_process)
+            IssueProcessor.close_issue_if_not_closed(
+                issue_info,
+                platform
+            )
+            return
 
         if IssueProcessor.verify_not_archived_object(
             issue_info, config

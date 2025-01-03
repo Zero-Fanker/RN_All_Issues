@@ -45,6 +45,7 @@ class Log():
     save_issue_content_to_file = '''正在将Issue内容写入至 {issue_output_path} '''
     unexpected_platform_type = '''未知的Issue平台类型 "{platform_type}"，请检查命令行参数输入和环境变量'''
     issue_already_archived = '''{issue_repository}#{issue_id} 已存在归档记录，无需再次归档，跳过归档流程'''
+    manually_skip_archived_process = '''评论中发现跳过归档流程关键字，跳过归档流程'''
     issue_output_not_found = '''未找到格式化的issue信息文件，跳过归档写入流程'''
     missing_issue_number = '''"{issues_number_var}"变量为空，必须填写"{issues_number_var}"才能执行归档流程'''
     invalid_issue_number = '''"{issues_number_var}"的值不能转换成整数，请检查输入参数是否正确'''

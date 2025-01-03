@@ -82,6 +82,8 @@ class Config():
         default_factory=list)
     archive_version_reges_for_comments: list[str] = field(
         default_factory=list)
+    skip_archived_reges_for_comments: list[str] = field(
+        default_factory=list)
     version_regex: str = str()
     issue_type: IssueType = IssueType()
     introduced_version_reges: list[str] = field(

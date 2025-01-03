@@ -65,17 +65,17 @@ class IssueProcessor():
         platform: GitServiceClient,
     ) -> IssueInfo:
         issue_info = IssueInfo()
-        
+
         if isinstance(platform, GithubClient):
             GithubIssueDataSource().load(issue_info)
             issue_info.update(
-            platform_type=platform.name
-        )
+                platform_type=platform.name
+            )
         elif isinstance(platform, GitlabClient):
             GitlabIssueDataSource().load(issue_info)
             issue_info.update(
-            platform_type=platform.name
-        )
+                platform_type=platform.name
+            )
         else:
             raise UnexpectedPlatform(
                 Log.unexpected_platform_type
@@ -83,6 +83,15 @@ class IssueProcessor():
                     platform_type=type(platform)
                 ))
         return issue_info
+
+    @staticmethod
+    def should_skip_archived_process(
+        issue_info: IssueInfo,
+        skip_archived_reges_for_comments: list[str],
+    ) -> bool:
+        return issue_info.should_skip_archived_process(
+            skip_archived_reges_for_comments
+        )
 
     @staticmethod
     def verify_not_archived_object(
@@ -93,8 +102,8 @@ class IssueProcessor():
         # gitlab的reopen issue事件应该被跳过
         # 而手动触发的流水线有可能目标Issue是还没被closed的
         if (CiEventType.should_ci_running_in_issue_event()
-            and (issue_info.issue_state
-                         == IssueState.open)
+                and (issue_info.issue_state
+                     == IssueState.open)
             ):
             print(Log.issue_state_is_open)
             return True
@@ -183,8 +192,8 @@ class IssueProcessor():
         platform: GitServiceClient,
     ) -> None:
         if (CiEventType.should_ci_running_in_manual()
-            and (issue_info.issue_state
-                         == IssueState.open)
+                and (issue_info.issue_state
+                     == IssueState.open)
             ):
             platform.close_issue(
                 issue_info.links.issue_url

@@ -119,6 +119,17 @@ class IssueInfo():
 
     def update(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
+        
+    def should_skip_archived_process(
+        self,
+        skip_archived_reges_for_comments: list[str],
+    ):
+        comments = self.issue_comments
+        for comment in comments:
+            for skip_regex in skip_archived_reges_for_comments:
+                if len(re.findall(skip_regex, comment.body)) > 0:
+                    return True
+        return False
 
     def get_introduced_version_from_description(
         self,
