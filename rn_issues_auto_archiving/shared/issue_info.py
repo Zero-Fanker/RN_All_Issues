@@ -10,6 +10,7 @@ from shared.exception import *
 
 
 AUTO_ISSUE_TYPE = "自动判断"
+ISSUE_NOTE_REGEX = r'[\[（]注释[\]）][\:：].*'  # 匹配 issue 描述里的注释
 
 
 class LinksJson(TypedDict):
@@ -119,7 +120,7 @@ class IssueInfo():
 
     def update(self, **kwargs) -> None:
         self.__dict__.update(kwargs)
-        
+
     def should_skip_archived_process(
         self,
         skip_archived_reges_for_comments: list[str],
@@ -140,7 +141,9 @@ class IssueInfo():
               .format(another=Log.issue_description,
                       something=Log.introduced_version))
 
-        issue_body = self.issue_body
+        issue_body = self.remove_useless_notes_in_description(
+            self.issue_body
+        )
         issue_type = self.issue_type
         introduced_versions: list[str] = []
         for regex in introduced_version_reges:
@@ -288,6 +291,12 @@ class IssueInfo():
             )
 
         return True
+
+    def remove_useless_notes_in_description(
+            self,
+            description: str
+    ) -> str:
+        return re.sub(ISSUE_NOTE_REGEX, "", description)
 
     def remove_issue_type_in_issue_title(
             self,
