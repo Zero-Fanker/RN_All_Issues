@@ -9,7 +9,7 @@ class ErrorMessage():
     '''
 
     missing_archive_version = '''Issue评论中找不到归档版本号关键字，请确保Issue评论中归档关键字格式正确且包含归档版本号。补全必要信息后请再次关闭Issue重新触发归档流程。
-    归档关键字格式有：["x.xx.xxx测试通过","已验证，版本号:xxx"]
+    归档关键字格式有：{keywords}
     '''
 
     too_many_archive_version = '''Issue评论中匹配到多个版本号关键字，请确保Issue评论中归档关键字格式正确且只包含一个格式的归档关键字。补全必要信息后请再次关闭Issue重新触发归档流程。

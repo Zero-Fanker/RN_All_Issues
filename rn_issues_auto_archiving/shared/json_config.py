@@ -89,3 +89,9 @@ class Config():
     introduced_version_reges: list[str] = field(
         default_factory=list)
     archived_document: ArchivedDocument = ArchivedDocument()
+
+    @property
+    def raw_archive_version_reges_for_comments(self) -> list[str]:
+        return [regex.replace(self.version_regex, '{version_regex}')
+                for regex in
+                self.archive_version_reges_for_comments]

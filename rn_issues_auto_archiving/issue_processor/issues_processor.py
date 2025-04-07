@@ -121,6 +121,7 @@ class IssueProcessor():
                 or not running_in_manual):
             not_archived_issue = not issue_info.should_archive_issue(
                 config.archive_version_reges_for_comments,
+                config.raw_archive_version_reges_for_comments,
                 config.archive_necessary_labels,
             )
             if not running_in_manual and not_archived_issue:

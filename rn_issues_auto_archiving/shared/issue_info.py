@@ -238,6 +238,7 @@ class IssueInfo():
     def should_archive_issue(
         self,
         archive_version_reges_for_comments: list[str],
+        raw_archive_version_reges_for_comments: list[str],
         archive_necessary_labels: list[str],
         check_labels: bool = True,
         check_archive_version: bool = True
@@ -288,6 +289,7 @@ class IssueInfo():
                 and check_archive_version):
             raise ArchiveVersionError(
                 ErrorMessage.missing_archive_version
+                .format(keywords=raw_archive_version_reges_for_comments)
             )
 
         return True

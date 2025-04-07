@@ -31,13 +31,24 @@ def apply_place_holder(obj: dict,
         if isinstance(value, dict):
             apply_place_holder(value, place_holder)
         elif isinstance(value, str):
-            obj[key] = value.format_map(place_holder)
+            for place_holder_key, place_holder_value in place_holder.items():
+                reference_mark = '{' + place_holder_key + '}'
+                if reference_mark not in value:
+                    continue
+                obj[key] = value.replace(reference_mark, place_holder_value)
         elif isinstance(value, list):
-            obj[key] = [item.format_map(place_holder)
-                        for item in value
-                        if isinstance(item, str)
-                        ]
+            for index,item in enumerate(value):
+                if isinstance(item, str):
+                    for place_holder_key, place_holder_value in place_holder.items():
+                        reference_mark = '{' + place_holder_key + '}'
+                        if reference_mark not in item:
+                            continue
+                        obj[key][index] = item.replace(reference_mark, place_holder_value)
+                    
+                        
 
+            
+            
 
 class EnvConfigDataSource(DataSource):
     def load(self, config: Config) -> None:
