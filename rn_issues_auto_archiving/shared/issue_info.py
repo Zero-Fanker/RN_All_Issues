@@ -185,24 +185,24 @@ class IssueInfo():
               .format(another=Log.issue_comment, something=Log.archive_version))
 
         issue_comments = self.issue_comments
-        archive_version_list: list[str] = []
+        archive_versions: set[str] = set()
         for comment in issue_comments:
             for comment_regex in comment_reges:
                 if len(match_result := re.findall(
                         comment_regex, comment.body)) > 0:
-                    archive_version_list.extend(match_result)
-        if len(archive_version_list) >= 2:
+                    archive_versions.update(match_result)
+        if len(archive_versions) >= 2:
             print(Log.too_many_archive_version)
             raise ArchiveVersionError(
                 ErrorMessage.too_many_archive_version
-                .format(versions=[i for i in archive_version_list])
+                .format(versions=[i for i in archive_versions])
             )
-        elif len(archive_version_list) == 0:
+        elif len(archive_versions) == 0:
             return ""
-        elif len(archive_version_list) == 1:
+        elif len(archive_versions) == 1:
             print(Log.getting_something_from_success
                   .format(another=Log.issue_comment, something=Log.archive_version))
-        return archive_version_list[0]
+        return archive_versions.pop()
 
     def get_issue_type_from_labels(
             self,
