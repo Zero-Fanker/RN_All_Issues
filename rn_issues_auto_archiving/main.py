@@ -27,6 +27,7 @@ def main() -> None:
     if should_run_in_local():
         print(Log.non_platform_action_env)
         from dotenv import load_dotenv
+
         load_dotenv()
 
     test_platform_type = get_value_from_args(
@@ -46,16 +47,10 @@ def main() -> None:
         return
 
     config = IssueProcessor.init_config(
-        ConfigManager([
-            EnvConfigDataSource(),
-            JsonConfigDataSource(config_path)
-        ])
+        ConfigManager([EnvConfigDataSource(), JsonConfigDataSource(config_path)])
     )
 
-    platform = IssueProcessor.init_git_service_client(
-        test_platform_type,
-        config
-    )
+    platform = IssueProcessor.init_git_service_client(test_platform_type, config)
 
     try:
         issue_info = IssueProcessor.init_issue_info(platform)
@@ -64,56 +59,39 @@ def main() -> None:
 
     try:
         platform.enrich_missing_issue_info(issue_info)
-        
+
         if IssueProcessor.should_skip_archived_process(
-            issue_info, 
-            config.skip_archived_reges_for_comments
+            issue_info, config.skip_archived_reges_for_comments
         ):
             print(Log.manually_skip_archived_process)
-            IssueProcessor.close_issue_if_not_closed(
-                issue_info,
-                platform
-            )
+            IssueProcessor.close_issue_if_not_closed(issue_info, platform)
             return
 
-        if IssueProcessor.verify_not_archived_object(
-            issue_info, config
-        ):
+        if IssueProcessor.verify_not_archived_object(issue_info, config):
             return
 
         IssueProcessor.update_issue_info_with_gather_info(
-            issue_info,
-            IssueProcessor.gather_info_from_issue(
-                issue_info,
-                config
-            )
+            issue_info, IssueProcessor.gather_info_from_issue(issue_info, config)
         )
-        IssueProcessor.parse_issue_info_for_archived(
-            issue_info,
-            config
-        )
-        IssueProcessor.close_issue_if_not_closed(
-            issue_info,
-            platform
-        )
+        IssueProcessor.parse_issue_info_for_archived(issue_info, config)
+        IssueProcessor.close_issue_if_not_closed(issue_info, platform)
 
         # 将issue内容写入归档文件
         archive_document = ArchiveDocument()
         archive_document.file_load(config.archived_document_path)
 
-        if (CiEventType.should_ci_running_in_issue_event()
-                and archive_document.should_issue_record_exists(
-                    issue_info.issue_repository,
-                    issue_info.issue_id
-        )):
-            comment_message = (Log.issue_already_archived
-                               .format(issue_id=issue_info.issue_id,
-                                       issue_repository=issue_info.issue_repository))
-            print(comment_message)
-            platform.send_comment(
-                issue_info.links.comment_url,
-                comment_message
+        if (
+            CiEventType.should_ci_running_in_issue_event()
+            and archive_document.should_issue_record_exists(
+                issue_info.issue_repository, issue_info.issue_id
             )
+        ):
+            comment_message = Log.issue_already_archived.format(
+                issue_id=issue_info.issue_id,
+                issue_repository=issue_info.issue_repository,
+            )
+            print(comment_message)
+            platform.send_comment(issue_info.links.comment_url, comment_message)
             return
 
         archive_document.archive_issue(
@@ -124,7 +102,6 @@ def main() -> None:
             archive_template=config.archived_document.archive_template,
             fill_issue_url_by_repository_type=config.archived_document.fill_issue_url_by_repository_type,
             issue_title_processing_rules=config.archived_document.issue_title_processing_rules,
-
             # 归档所需issue数据
             issue_id=issue_info.issue_id,
             issue_type=issue_info.issue_type,
@@ -133,30 +110,18 @@ def main() -> None:
             introduced_version=issue_info.introduced_version,
             issue_url=issue_info.links.issue_web_url,
             archive_version=issue_info.archive_version,
-
-            replace_mode=(
-                issue_info.ci_event_type in CiEventType.manual
-            )
+            replace_mode=(issue_info.ci_event_type in CiEventType.manual),
         )
         issue_info.set_archived_success()
 
         # 为了后续推送文档和发送归档成功评论的脚本
         # 而将issue信息输出一个json文件
-        issue_info.json_dump(
-            config.issue_output_path
-        )
+        issue_info.json_dump(config.issue_output_path)
 
-    except (
-        ArchiveBaseError
-    ) as exc:
+    except ArchiveBaseError as exc:
         print(Log.archiving_condition_not_satisfied)
-        platform.reopen_issue(
-            issue_info.links.issue_url
-        )
-        platform.send_comment(
-            issue_info.links.comment_url,
-            str(exc)
-        )
+        platform.reopen_issue(issue_info.links.issue_url)
+        platform.send_comment(issue_info.links.comment_url, str(exc))
         raise
     finally:
         platform.close()
@@ -165,10 +130,7 @@ def main() -> None:
         except Exception:
             pass
 
-        print(Log.time_used.format(
-            time="{:.4f}".format(
-                time.time() - start_time)
-        ))
+        print(Log.time_used.format(time="{:.4f}".format(time.time() - start_time)))
 
         print(Log.job_done)
 

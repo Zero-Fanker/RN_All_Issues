@@ -31,12 +31,13 @@ def http_request(
             return response
         except httpx.HTTPStatusError:
             try:
-                print(Log.http_status_error
-                      .format(
-                          reason=json_dumps(
-                              response.json(),
-                          ),
-                      ))
+                print(
+                    Log.http_status_error.format(
+                        reason=json_dumps(
+                            response.json(),
+                        ),
+                    )
+                )
             except Exception:
                 pass
             raise

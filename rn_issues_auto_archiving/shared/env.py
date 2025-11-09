@@ -1,8 +1,7 @@
 import os
 
 
-class Env():
-
+class Env:
     # github action
     GITHUB_ACTIONS = "GITHUB_ACTIONS"
     ISSUE_STATE = "ISSUE_STATE"
@@ -14,7 +13,6 @@ class Env():
     MANUAL_COMMENTS_URL = "MANUAL_COMMENTS_URL"
     ISSUE_URL = "ISSUE_URL"
     COMMENTS_URL = "COMMENTS_URL"
-
 
     # gitlab ci
     GITLAB_CI = "GITLAB_CI"
@@ -37,7 +35,7 @@ class Env():
     ISSUE_TITLE = "ISSUE_TITLE"
     ISSUE_TYPE = "ISSUE_TYPE"
     TARGET_BRANCH = "TARGET_BRANCH"
-    
+
 
 def should_run_in_github_action() -> bool:
     return os.environ.get(Env.GITHUB_ACTIONS) == "true"
@@ -48,7 +46,4 @@ def should_run_in_gitlab_ci() -> bool:
 
 
 def should_run_in_local() -> bool:
-    return (not should_run_in_github_action()
-            and not should_run_in_gitlab_ci())
-    
-    
+    return not should_run_in_github_action() and not should_run_in_gitlab_ci()

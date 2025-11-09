@@ -1,4 +1,5 @@
-from typing import TypedDict,Any
+from typing import TypedDict, Any
+
 
 class GitlabAuthorJson(TypedDict):
     avatar_url: str
@@ -8,6 +9,7 @@ class GitlabAuthorJson(TypedDict):
     state: str
     username: str
     web_url: str
+
 
 class GitlabCommentJson(TypedDict):
     attachment: None
@@ -26,5 +28,5 @@ class GitlabCommentJson(TypedDict):
     project_id: int
     resolvable: bool
     system: bool
-    type: None    
+    type: None
     updated_at: str

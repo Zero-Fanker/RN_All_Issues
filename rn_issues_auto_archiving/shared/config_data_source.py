@@ -11,18 +11,16 @@ from shared.json_config import Config
 FORMAT_MAP_BLACK_LIST = [
     "version_regex",
     "introduced_version_reges",
-    "archive_template"
+    "archive_template",
 ]
 
 
-def apply_place_holder(obj: dict,
-                       place_holder: dict
-                       ):
-    '''为了能让某些value中能使用前面已经定义的value，
+def apply_place_holder(obj: dict, place_holder: dict):
+    """为了能让某些value中能使用前面已经定义的value，
     用来将替换{}语法字符串替换成真正的value \n
     example:  \n
     "{version_regex}测试通过" 中花括号的内容，会被替换成 "version_regex" 的value
-    '''
+    """
     for key, value in obj.items():
         # version_regex 为了判断版本号，用了正则的花括号语法
         # 这会导致format_map报错
@@ -32,23 +30,21 @@ def apply_place_holder(obj: dict,
             apply_place_holder(value, place_holder)
         elif isinstance(value, str):
             for place_holder_key, place_holder_value in place_holder.items():
-                reference_mark = '{' + place_holder_key + '}'
+                reference_mark = "{" + place_holder_key + "}"
                 if reference_mark not in value:
                     continue
                 obj[key] = value.replace(reference_mark, place_holder_value)
         elif isinstance(value, list):
-            for index,item in enumerate(value):
+            for index, item in enumerate(value):
                 if isinstance(item, str):
                     for place_holder_key, place_holder_value in place_holder.items():
-                        reference_mark = '{' + place_holder_key + '}'
+                        reference_mark = "{" + place_holder_key + "}"
                         if reference_mark not in item:
                             continue
-                        obj[key][index] = item.replace(reference_mark, place_holder_value)
-                    
-                        
+                        obj[key][index] = item.replace(
+                            reference_mark, place_holder_value
+                        )
 
-            
-            
 
 class EnvConfigDataSource(DataSource):
     def load(self, config: Config) -> None:
@@ -63,33 +59,18 @@ class JsonConfigDataSource(DataSource):
         super().__init__()
         self.json_path = json_path
 
-    def load(
-            self,
-            config: Config
-    ) -> None:
+    def load(self, config: Config) -> None:
         config_path = self.json_path
 
-        print(Log.loading_something
-              .format(something=config_path))
+        print(Log.loading_something.format(something=config_path))
 
-        raw_json: dict = dict(
-            json.loads(
-                Path(config_path
-                     ).read_text(encoding="utf-8")
-            )
-        )
-        print(Log.loading_something_success
-              .format(something=config_path))
+        raw_json: dict = dict(json.loads(Path(config_path).read_text(encoding="utf-8")))
+        print(Log.loading_something_success.format(something=config_path))
 
-        apply_place_holder(
-            obj=raw_json,
-            place_holder=raw_json
-        )
+        apply_place_holder(obj=raw_json, place_holder=raw_json)
 
-        issue_type = Config.IssueType(
-            **raw_json.pop("issue_type"))
-        archived_document = Config.ArchivedDocument(
-            **raw_json.pop("archived_document"))
+        issue_type = Config.IssueType(**raw_json.pop("issue_type"))
+        archived_document = Config.ArchivedDocument(**raw_json.pop("archived_document"))
         config.__dict__.update(**raw_json)
         config.issue_type = issue_type
         config.archived_document = archived_document

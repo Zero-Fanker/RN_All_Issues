@@ -24,7 +24,7 @@ def get_issue_id_from_url(url: str) -> int:
 
 
 @dataclass()
-class Issue():
+class Issue:
     id: int
     title: str
     state: str
@@ -34,7 +34,7 @@ class Issue():
 
 
 @dataclass()
-class PlatformEnvironments():
+class PlatformEnvironments:
     token: str
     issue_number: int
     issue_title: str
@@ -45,7 +45,6 @@ class PlatformEnvironments():
 
 
 class GitServiceClient(ABC):
-
     @abstractmethod
     def _get_comments_from_platform(
         self,
@@ -93,9 +92,10 @@ class GitServiceClient(ABC):
     def close_issue_body(self) -> dict[str, str]:
         pass
 
-    def __init__(self,
-                 token: str,
-                 ):
+    def __init__(
+        self,
+        token: str,
+    ):
         self._token: str = token
         self._platform_type: str
         self._http_header: dict[str, str]
@@ -131,26 +131,21 @@ class GitServiceClient(ABC):
                     )
                 except Exception:
                     pass
-                print(Log.http_status_error
-                      .format(
-                          reason=reason,
-                      ))
+                print(
+                    Log.http_status_error.format(
+                        reason=reason,
+                    )
+                )
                 raise
             except Exception as e:
                 error = e
         raise error
 
-    def enrich_missing_issue_info(
-        self,
-        issue_info: IssueInfo
-    ) -> None:
-
+    def enrich_missing_issue_info(self, issue_info: IssueInfo) -> None:
         issue_info.issue_comments = self._get_comments_from_platform(
             issue_info.links.comment_url
         )
-        new_issue_info = self._get_issue_info_from_platform(
-            issue_info.links.issue_url
-        )
+        new_issue_info = self._get_issue_info_from_platform(issue_info.links.issue_url)
         issue_info.issue_labels = new_issue_info.labels
         issue_info.links.issue_web_url = new_issue_info.issue_web_url
         if CiEventType.should_ci_running_in_manual():
@@ -160,26 +155,17 @@ class GitServiceClient(ABC):
             if issue_info.issue_body == "":
                 issue_info.issue_body = new_issue_info.body
 
-    def send_comment(
-            self,
-            comment_url: str,
-            comment_body: str) -> None:
-        ''' api结构详见：\n
+    def send_comment(self, comment_url: str, comment_body: str) -> None:
+        """api结构详见：\n
         Github ： https://docs.github.com/zh/rest/issues/comments?apiVersion=2022-11-28#create-an-issue-comment \n
         Gitlab ： https://docs.gitlab.com/ee/api/notes.html#create-new-issue-note \n
         两边API创建评论所需的参数都是一致的
-        '''
-        print(Log.sending_something.format(
-            something=Log.announcement_comment))
+        """
+        print(Log.sending_something.format(something=Log.announcement_comment))
         self.http_request(
-            method="POST",
-            url=comment_url,
-            json_content={
-                "body": comment_body
-            }
+            method="POST", url=comment_url, json_content={"body": comment_body}
         )
-        print(Log.sending_something_success
-              .format(something=Log.announcement_comment))
+        print(Log.sending_something_success.format(something=Log.announcement_comment))
 
 
 class GithubClient(GitServiceClient):
@@ -187,11 +173,11 @@ class GithubClient(GitServiceClient):
 
     @staticmethod
     def create_http_header(token: str) -> dict[str, str]:
-        ''' 所需http header结构详见：
-        https://docs.github.com/zh/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#example-request-using-query-parameters'''
+        """所需http header结构详见：
+        https://docs.github.com/zh/rest/using-the-rest-api/getting-started-with-the-rest-api?apiVersion=2022-11-28#example-request-using-query-parameters"""
         return {
-            "Authorization": f'Bearer {token}',
-            "Accept": "application/vnd.github+json"
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
         }
 
     @property
@@ -200,9 +186,7 @@ class GithubClient(GitServiceClient):
 
     @property
     def reopen_issue_body(self) -> dict[str, str]:
-        return {
-            "state": "open"
-        }
+        return {"state": "open"}
 
     @property
     def close_issue_method(self) -> str:
@@ -210,15 +194,11 @@ class GithubClient(GitServiceClient):
 
     @property
     def close_issue_body(self) -> dict[str, str]:
-        return {
-            "state": "closed"
-        }
+        return {"state": "closed"}
 
     def _init_http_client(self) -> None:
         self._http_header = self.create_http_header(self._token)
-        self._http_client = httpx.Client(
-            headers=self._http_header
-        )
+        self._http_client = httpx.Client(headers=self._http_header)
 
     def __init__(self, token: str):
         super().__init__(token)
@@ -229,38 +209,36 @@ class GithubClient(GitServiceClient):
         self,
         url: str,
     ) -> list[IssueInfo.Comment]:
-        ''' api结构详见：
-        https://docs.github.com/en/rest/issues/comments?apiVersion=2022-11-28#list-issue-comments-for-a-repository'''
+        """api结构详见：
+        https://docs.github.com/en/rest/issues/comments?apiVersion=2022-11-28#list-issue-comments-for-a-repository"""
         print(Log.getting_something.format(something=Log.issue_comment))
         comments: list[IssueInfo.Comment] = []
         page = 1
         while True:
             response: httpx.Response = self.http_request(
-                url=url,
-                params={"page": str(page)}
+                url=url, params={"page": str(page)}
             )
-            raw_json: list[GithubCommentJson
-                           ] = response.json()
+            raw_json: list[GithubCommentJson] = response.json()
             if len(raw_json) == 0:
                 break
             comments.extend(
-                [IssueInfo.Comment(author=comment["user"]["login"],
-                                   body=comment["body"])
-                 for comment in raw_json])
+                [
+                    IssueInfo.Comment(
+                        author=comment["user"]["login"], body=comment["body"]
+                    )
+                    for comment in raw_json
+                ]
+            )
             page += 1
 
-        print(Log.getting_something_success.
-              format(something=Log.issue_comment))
+        print(Log.getting_something_success.format(something=Log.issue_comment))
         return comments
 
     def _get_issue_info_from_platform(self, issue_url: str) -> Issue:
-        ''' 所需http header结构详见：
-        https://docs.github.com/zh/rest/issues/issues?apiVersion=2022-11-28#get-an-issue'''
+        """所需http header结构详见：
+        https://docs.github.com/zh/rest/issues/issues?apiVersion=2022-11-28#get-an-issue"""
         print(Log.getting_issue_info)
-        response = self.http_request(
-            url=issue_url,
-            method="GET"
-        )
+        response = self.http_request(url=issue_url, method="GET")
         print(Log.getting_issue_info_success)
         raw_json = response.json()
         return Issue(
@@ -268,44 +246,39 @@ class GithubClient(GitServiceClient):
             title=raw_json["title"],
             state=parse_issue_state(raw_json["state"]),
             body=raw_json["body"],
-            labels=[label["name"]
-                    for label in raw_json["labels"]],
+            labels=[label["name"] for label in raw_json["labels"]],
             issue_web_url=raw_json["html_url"],
         )
 
     def reopen_issue(self, issue_url: str) -> None:
-        ''' api结构详见：
-        https://docs.github.com/zh/rest/issues/issues?apiVersion=2022-11-28#update-an-issue'''
+        """api结构详见：
+        https://docs.github.com/zh/rest/issues/issues?apiVersion=2022-11-28#update-an-issue"""
         url = issue_url
-        print(Log.reopen_issue
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url)))
+        print(Log.reopen_issue.format(issue_number=get_issue_id_from_url(issue_url)))
         self.http_request(
             method=self.reopen_issue_method,
             url=url,
-            json_content=self.reopen_issue_body
+            json_content=self.reopen_issue_body,
         )
-        print(Log.reopen_issue_success
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url))
-              )
+        print(
+            Log.reopen_issue_success.format(
+                issue_number=get_issue_id_from_url(issue_url)
+            )
+        )
 
     def close_issue(self, issue_url: str) -> None:
-        ''' api结构详见：
-        https://docs.github.com/zh/rest/issues/issues?apiVersion=2022-11-28#update-an-issue'''
+        """api结构详见：
+        https://docs.github.com/zh/rest/issues/issues?apiVersion=2022-11-28#update-an-issue"""
         url = issue_url
-        print(Log.close_issue
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url)))
+        print(Log.close_issue.format(issue_number=get_issue_id_from_url(issue_url)))
         self.http_request(
-            method=self.close_issue_method,
-            url=url,
-            json_content=self.close_issue_body
+            method=self.close_issue_method, url=url, json_content=self.close_issue_body
         )
-        print(Log.close_issue_success
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url))
-              )
+        print(
+            Log.close_issue_success.format(
+                issue_number=get_issue_id_from_url(issue_url)
+            )
+        )
 
     def close(self):
         self._http_client.close()
@@ -316,16 +289,15 @@ class GitlabClient(GitServiceClient):
 
     @staticmethod
     def should_issue_type_webhook() -> bool:
-        '''Gitlab流水线通过webhook触发流水线，
+        """Gitlab流水线通过webhook触发流水线，
         且无法在流水线测区分webhook事件，
         可能会遇到非Issue事件触发的webhook触发了自动归档流水线
         （例如push事件webhook触发的自动部署流水线）
         gitlab webhook事件类型详见：
         https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#push-events
-        '''
+        """
         try:
-            webhook_payload = json.loads(
-                os.environ[Env.WEBHOOK_PAYLOAD])
+            webhook_payload = json.loads(os.environ[Env.WEBHOOK_PAYLOAD])
             if webhook_payload["event_name"] == "issue":
                 print(Log.issue_type_webhook_detected)
                 return True
@@ -338,12 +310,9 @@ class GitlabClient(GitServiceClient):
 
     @staticmethod
     def create_http_header(token: str) -> dict[str, str]:
-        ''' 所需http header结构详见：
-        https://docs.gitlab.com/ee/api/rest/index.html#request-payload'''
-        return {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        }
+        """所需http header结构详见：
+        https://docs.gitlab.com/ee/api/rest/index.html#request-payload"""
+        return {"Authorization": "Bearer " + token, "Content-Type": "application/json"}
 
     @property
     def reopen_issue_method(self) -> str:
@@ -351,9 +320,7 @@ class GitlabClient(GitServiceClient):
 
     @property
     def reopen_issue_body(self) -> dict[str, str]:
-        return {
-            "state_event": "reopen"
-        }
+        return {"state_event": "reopen"}
 
     @property
     def close_issue_method(self) -> str:
@@ -361,15 +328,11 @@ class GitlabClient(GitServiceClient):
 
     @property
     def close_issue_body(self) -> dict[str, str]:
-        return {
-            "state_event": "close"
-        }
+        return {"state_event": "close"}
 
     def _init_http_client(self) -> None:
         self._http_header = self.create_http_header(self._token)
-        self._http_client = httpx.Client(
-            headers=self._http_header
-        )
+        self._http_client = httpx.Client(headers=self._http_header)
 
     def __init__(self, token: str):
         super().__init__(token)
@@ -380,40 +343,38 @@ class GitlabClient(GitServiceClient):
         self,
         url: str,
     ) -> list[IssueInfo.Comment]:
-        ''' api结构详见：
+        """api结构详见：
         https://docs.gitlab.com/ee/api/notes.html#list-project-issue-notes\n
         page参数：
         https://docs.gitlab.com/ee/api/rest/index.html#pagination
-        '''
+        """
         print(Log.getting_something.format(something=Log.issue_comment))
         comments: list[IssueInfo.Comment] = []
         page = 1
         while True:
             response: httpx.Response = self.http_request(
-                url=url,
-                params={"page": str(page)}
+                url=url, params={"page": str(page)}
             )
-            raw_json: list[GitlabCommentJson
-                           ] = response.json()
+            raw_json: list[GitlabCommentJson] = response.json()
             if len(raw_json) == 0:
                 break
             comments.extend(
-                [IssueInfo.Comment(author=comment["author"]["username"],
-                                   body=comment["body"])
-                 for comment in raw_json])
+                [
+                    IssueInfo.Comment(
+                        author=comment["author"]["username"], body=comment["body"]
+                    )
+                    for comment in raw_json
+                ]
+            )
             page += 1
-        print(Log.getting_something_success.
-              format(something=Log.issue_comment))
+        print(Log.getting_something_success.format(something=Log.issue_comment))
         return comments
 
     def _get_issue_info_from_platform(self, issue_url: str) -> Issue:
-        ''' 所需http header结构详见：
-        https://docs.gitlab.com/ee/api/issues.html#single-issue'''
+        """所需http header结构详见：
+        https://docs.gitlab.com/ee/api/issues.html#single-issue"""
         print(Log.getting_issue_info)
-        response = self.http_request(
-            method="GET",
-            url=issue_url
-        )
+        response = self.http_request(method="GET", url=issue_url)
         print(Log.getting_issue_info_success)
         raw_json = response.json()
         return Issue(
@@ -426,38 +387,34 @@ class GitlabClient(GitServiceClient):
         )
 
     def reopen_issue(self, issue_url: str) -> None:
-        ''' api结构详见：
-        https://docs.gitlab.com/ee/api/issues.html#edit-an-issue'''
+        """api结构详见：
+        https://docs.gitlab.com/ee/api/issues.html#edit-an-issue"""
         url = issue_url
-        print(Log.reopen_issue
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url)))
+        print(Log.reopen_issue.format(issue_number=get_issue_id_from_url(issue_url)))
         self.http_request(
             method=self.reopen_issue_method,
             url=url,
-            json_content=self.reopen_issue_body
+            json_content=self.reopen_issue_body,
         )
-        print(Log.reopen_issue_success
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url))
-              )
+        print(
+            Log.reopen_issue_success.format(
+                issue_number=get_issue_id_from_url(issue_url)
+            )
+        )
 
     def close_issue(self, issue_url: str) -> None:
-        ''' api结构详见：
-        https://docs.gitlab.com/ee/api/issues.html#edit-an-issue'''
+        """api结构详见：
+        https://docs.gitlab.com/ee/api/issues.html#edit-an-issue"""
         url = issue_url
-        print(Log.close_issue
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url)))
+        print(Log.close_issue.format(issue_number=get_issue_id_from_url(issue_url)))
         self.http_request(
-            method=self.close_issue_method,
-            url=url,
-            json_content=self.close_issue_body
+            method=self.close_issue_method, url=url, json_content=self.close_issue_body
         )
-        print(Log.close_issue_success
-              .format(issue_number=get_issue_id_from_url(
-                  issue_url))
-              )
+        print(
+            Log.close_issue_success.format(
+                issue_number=get_issue_id_from_url(issue_url)
+            )
+        )
 
     def close(self):
         self._http_client.close()

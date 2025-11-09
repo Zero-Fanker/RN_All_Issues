@@ -1,4 +1,4 @@
-class ApiPath():
+class ApiPath:
     base = "api/v4"
     projects = "projects"
     issues = "issues"

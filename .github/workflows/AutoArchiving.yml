@@ -62,16 +62,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python and install dependencies
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v5
         with:
-          python-version: "3.10"
-          cache: 'pip' # caching pip dependencies
-      - run: |
-          pip install -r ./rn_issues_auto_archiving/issue_processor/requirements.txt
-          pip install -r ./rn_issues_auto_archiving/auto_archiving/requirements.txt
+          fetch-depth: 1 
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: "true"
+          cache-python: "true"
+          
+      - name: Install dependencies
+        run: uv sync --frozen
   
       - name: Processing issue content
         env:
@@ -90,7 +92,7 @@ jobs:
           MANUAL_ISSUE_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.inputs.issue_number }}"
           MANUAL_COMMENTS_URL: "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.inputs.issue_number }}/comments"
         run: |
-          python ./rn_issues_auto_archiving/main.py --config "./config/auto_archiving.json"
+          uv run ./rn_issues_auto_archiving/main.py --config "./config/auto_archiving.json"
           
       - name: Add and commit changes
         run: |
@@ -98,7 +100,7 @@ jobs:
 
       - name: Send archiving success comment
         run: |
-          python ./rn_issues_auto_archiving/archiving_success.py
+          uv run ./rn_issues_auto_archiving/archiving_success.py
           
 
 
