@@ -1,4 +1,4 @@
-﻿# concurrency就是控制并发的，流水线运行后会自动加锁
+# concurrency就是控制并发的，流水线运行后会自动加锁
 # 在一个组的流水线任务只能有一个在运行，其他流水线任务会被pedding
 # 文档：https://docs.github.com/zh/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs
 concurrency:
