@@ -99,6 +99,7 @@ class IssueProcessor:
         if (running_in_manual and not_input_archive_version) or not running_in_manual:
             not_archived_issue = not issue_info.should_archive_issue(
                 config.archive_version_reges_for_comments,
+                config.archive_version_ignore_line_reges_for_comments,
                 config.raw_archive_version_reges_for_comments,
                 config.archive_necessary_labels,
             )
@@ -137,7 +138,8 @@ class IssueProcessor:
             )
 
         gather_info.archive_version = issue_info.get_archive_version_from_comments(
-            config.archive_version_reges_for_comments
+            config.archive_version_reges_for_comments,
+            config.archive_version_ignore_line_reges_for_comments,
         )
 
         return gather_info

@@ -42,15 +42,14 @@
     "archive_necessary_labels": [
         "resolved 已解决"
     ],
+    "archive_version_ignore_line_reges_for_comments":[
+         "^> "
+    ],
     "archive_version_reges_for_comments": [
         "{version_regex} *测试通过",
         "测试通过 *{version_regex}",
         "{version_regex} *验证通过",
         "验证通过 *{version_regex}",
-        "已验证[,，]版本号[:：] *{version_regex}",
-        "{version_regex} *已验证",
-        "{version_regex} *已验收",
-        "{version_regex} *已测试",
         "{version_regex} *已通过",
         "{version_regex} *通过",
         "{version_regex} *测试完成",

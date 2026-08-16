@@ -168,7 +168,9 @@ class IssueInfo:
         )
         return introduced_versions[0]
 
-    def get_archive_version_from_comments(self, comment_reges: list[str]) -> str:
+    def get_archive_version_from_comments(
+        self, comment_reges: list[str], ignore_line_reges: list[str]
+    ) -> str:
         """匹配不到归档版本号会返回一个空字符串"""
         print(
             Log.getting_something_from.format(
@@ -179,9 +181,17 @@ class IssueInfo:
         issue_comments = self.issue_comments
         archive_versions: set[str] = set()
         for comment in issue_comments:
-            for comment_regex in comment_reges:
-                if len(match_result := re.findall(comment_regex, comment.body)) > 0:
-                    archive_versions.update(match_result)
+            for line in comment.body.splitlines():
+                ignore_line = False
+                for ignore_line_regex in ignore_line_reges:
+                    if re.search(ignore_line_regex, line):
+                        ignore_line = True
+                        break
+                if ignore_line:
+                    continue
+                for comment_regex in comment_reges:
+                    if len(match_result := re.findall(comment_regex, line)) > 0:
+                        archive_versions.update(match_result)
         if len(archive_versions) >= 2:
             print(Log.too_many_archive_version)
             raise ArchiveVersionError(
@@ -233,6 +243,7 @@ class IssueInfo:
     def should_archive_issue(
         self,
         archive_version_reges_for_comments: list[str],
+        archive_version_ignore_line_reges_for_comments: list[str],
         raw_archive_version_reges_for_comments: list[str],
         archive_necessary_labels: list[str],
         check_labels: bool = True,
@@ -247,7 +258,8 @@ class IssueInfo:
         """
         issue_labels = self.issue_labels
         archive_version = self.get_archive_version_from_comments(
-            archive_version_reges_for_comments
+            archive_version_reges_for_comments,
+            archive_version_ignore_line_reges_for_comments,
         )
         if (
             should_not_match_archive_version := (archive_version == "")
