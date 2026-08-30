@@ -59,9 +59,8 @@
         "{version_regex} *自动归档"
     ],
     "skip_archived_reges_for_comments": [
-        "请?(直接关闭[iI]ssue)?(跳过|无需|不要|无需|请勿|不许|别|不|勿)归档(流程)?",
-        "请?(直接关闭[iI]ssue)",
-        "([dD]on't|[dD]ont|[sS]kip) *([aA]rchived|[aA]rchiving|[aA]rchive)"
+        "跳过归档流程",
+        "不进行归档流程"
     ],
     "archived_document": {
         "rjust_space_width": 60,
