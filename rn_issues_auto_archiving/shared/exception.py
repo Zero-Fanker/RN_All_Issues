@@ -1,41 +1,79 @@
+example_user_age_and_docs = """  
+  
+若不清楚归档流程, 请参考 [自动归档流水线使用指南.md] 和 [示例归档Issue]
+
+[自动归档流水线使用指南.md]: https://github.com/revengenowstudio/rn_issues_auto_archiving/blob/main/%E8%87%AA%E5%8A%A8%E5%BD%92%E6%A1%A3%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.md
+[示例归档Issue]: https://github.com/Zero-Fanker/RN_All_Issues/issues/780  
+
+"""
+
+
 class ErrorMessage:
     """自定义异常信息"""
 
-    missing_introduced_version = """Issue描述中找不到引入版本号，请确保Issue描述格式正确且包含“发现版本号”等版本号关键字。补全必要信息后请再次关闭Issue重新触发归档流程。
-    """
-
-    too_many_introduced_version = """Issue描述中匹配到多个引入版本号，请确保Issue描述格式正确且只包含一个版本号。补全必要信息后请再次关闭Issue重新触发归档流程。
-    匹配到的版本号有：{versions}
-    """
-
-    missing_archive_version = """Issue评论中找不到归档版本号关键字，请确保Issue评论中归档关键字格式正确且包含归档版本号。补全必要信息后请再次关闭Issue重新触发归档流程。  
-    归档关键字格式有：
-{hints}"""
-
+    # 此消息会被拼接在  too_many_introduced_version 后面
     skip_archived_hint = """如果需要跳过归档流程, 请发送带有如下关键字的评论并再次关闭issue即可:
 {hints}"""
 
-    too_many_archive_version = """Issue评论中匹配到多个版本号关键字，请确保Issue评论中归档关键字格式正确且只包含一个格式的归档关键字。补全必要信息后请再次关闭Issue重新触发归档流程。
+    missing_introduced_version = (
+        """Issue描述中找不到引入版本号，请确保Issue描述格式正确且包含“发现版本号”等版本号关键字。补全必要信息后请再次关闭Issue重新触发归档流程。
+    """
+        + example_user_age_and_docs
+    )
+
+    too_many_introduced_version = (
+        """Issue描述中匹配到多个引入版本号，请确保Issue描述格式正确且只包含一个版本号。补全必要信息后请再次关闭Issue重新触发归档流程。
     匹配到的版本号有：{versions}
     """
+        + example_user_age_and_docs
+    )
 
-    too_many_issue_type = """Issue标签中匹配到多个Issue类型标签，请确保Issue标签中只包含一个格式的Issue类型标签。请移除多余的Issue类型标签后再次关闭Issue重新触发归档流程。
+    missing_archive_version = (
+        """Issue评论中找不到归档版本号关键字，请确保Issue评论中归档关键字格式正确且包含归档版本号。补全必要信息后请再次关闭Issue重新触发归档流程。  
+    归档关键字格式有：
+{hints}"""
+        + example_user_age_and_docs
+    )
+
+    too_many_archive_version = (
+        """Issue评论中匹配到多个版本号关键字，请确保Issue评论中归档关键字格式正确且只包含一个格式的归档关键字。补全必要信息后请再次关闭Issue重新触发归档流程。
+    匹配到的版本号有：{versions}
+    """
+        + example_user_age_and_docs
+    )
+
+    too_many_issue_type = (
+        """Issue标签中匹配到多个Issue类型标签，请确保Issue标签中只包含一个格式的Issue类型标签。请移除多余的Issue类型标签后再次关闭Issue重新触发归档流程。
     匹配到的Issue类型标签有：{labels}
     """
+        + example_user_age_and_docs
+    )
 
-    missing_archive_labels = """Issue标签中找不到归档所需标签，请给Issue打上归档所需标签。补全必要信息后请再次关闭Issue重新触发归档流程。
+    missing_archive_labels = (
+        """Issue标签中找不到归档所需标签，请给Issue打上归档所需标签。补全必要信息后请再次关闭Issue重新触发归档流程。
     归档所需标签有：{labels}
     """
+        + example_user_age_and_docs
+    )
 
-    missing_issue_type_from_title = """Issue标题中找不到Issue关键字，请根据标准Issue格式在标题中补上Issue类型信息。补全必要信息后请再次关闭Issue重新触发归档流程。
+    missing_issue_type_from_title = (
+        """Issue标题中找不到Issue关键字，请根据标准Issue格式在标题中补上Issue类型信息。补全必要信息后请再次关闭Issue重新触发归档流程。
     可匹配的Issue类型关键字有：{issue_type}
     """
+        + example_user_age_and_docs
+    )
 
-    missing_issue_type_from_label = """Issue标签中找不到Issue类型标签，请给Issue打上Issue类型标签。补全必要信息后请再次关闭Issue重新触发归档流程。
+    missing_issue_type_from_label = (
+        """Issue标签中找不到Issue类型标签，请给Issue打上Issue类型标签。补全必要信息后请再次关闭Issue重新触发归档流程。
     可匹配的Issue类型标签有：{issue_type}
     """
-    missing_labels_and_archive_version = """手动归档流水线试图归档此Issue，但并未手动填写归档版本号且未在Issue信息中获取到有效的归档版本号和归档所需标签，请重新执行手动归档流水线并输入归档版本号且为此Issue打上Issue归档所需标签。
+        + example_user_age_and_docs
+    )
+    missing_labels_and_archive_version = (
+        """手动归档流水线试图归档此Issue，但并未手动填写归档版本号且未在Issue信息中获取到有效的归档版本号和归档所需标签，请重新执行手动归档流水线并输入归档版本号且为此Issue打上Issue归档所需标签。
     """
+        + example_user_age_and_docs
+    )
 
     unknown_action_name = """未知的action类型：{action_name}，无法找到与之对应的issue仓库类型
     """

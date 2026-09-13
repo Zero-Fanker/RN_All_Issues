@@ -151,17 +151,17 @@ config = Config(
     # rules 引用了 version_regex，改动 version_regex 时这里的正则同步生效
     # hint 里出现的版本号只是示例，脚本自己发的评论会被跳过，不会误匹配
     archive_version_reges_for_comments=[
-        MatchRules(rules=f"{version_regex} *测试通过", hint="0.99.918测试通过"),
-        MatchRules(rules=f"测试通过 *{version_regex}", hint="测试通过0.99.918"),
-        MatchRules(rules=f"{version_regex} *验证通过", hint="0.99.918验证通过"),
-        MatchRules(rules=f"验证通过 *{version_regex}", hint="验证通过0.99.918"),
-        # MatchRules(rules=f"{version_regex} *已通过", hint="0.99.918已通过"),
-        # MatchRules(rules=f"{version_regex} *通过", hint="0.99.918通过"),
-        # MatchRules(rules=f"{version_regex} *测试完成", hint="0.99.918测试完成"),
-        # MatchRules(rules=f"{version_regex} *归档", hint="0.99.918归档"),
-        # MatchRules(rules=f"^以{version_regex} *归档", hint="以0.99.918归档"),
-        # MatchRules(rules=f"^请以{version_regex} *归档", hint="请以0.99.918归档"),
-        # MatchRules(rules=f"{version_regex} *自动归档", hint="0.99.918自动归档"),
+        MatchRules(rules=f"{version_regex} *测试通过", hint="x.xx.xxx测试通过"),
+        MatchRules(rules=f"测试通过 *{version_regex}", hint="测试通过x.xx.xxx"),
+        MatchRules(rules=f"{version_regex} *验证通过", hint="x.xx.xxx验证通过"),
+        MatchRules(rules=f"验证通过 *{version_regex}", hint="验证通过x.xx.xxx"),
+        # MatchRules(rules=f"{version_regex} *已通过", hint="x.xx.xxx已通过"),
+        # MatchRules(rules=f"{version_regex} *通过", hint="x.xx.xxx通过"),
+        # MatchRules(rules=f"{version_regex} *测试完成", hint="x.xx.xxx测试完成"),
+        # MatchRules(rules=f"{version_regex} *归档", hint="x.xx.xxx归档"),
+        # MatchRules(rules=f"^以{version_regex} *归档", hint="以x.xx.xxx归档"),
+        # MatchRules(rules=f"^请以{version_regex} *归档", hint="请以x.xx.xxx归档"),
+        # MatchRules(rules=f"{version_regex} *自动归档", hint="x.xx.xxx自动归档"),
     ],
     skip_archived_reges_for_comments=[
         MatchRules(rules="跳过归档流程", hint="跳过归档流程"),
