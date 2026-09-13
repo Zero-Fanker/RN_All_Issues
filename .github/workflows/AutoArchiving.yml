@@ -60,6 +60,7 @@ jobs:
   auto_archiving:
     name: "Closed 外部Issue#${{ github.event.issue.number }}${{ github.event.inputs.issue_number }}"
     runs-on: ubuntu-latest
+    cache-mode: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
