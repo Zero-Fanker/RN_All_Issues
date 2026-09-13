@@ -60,7 +60,10 @@ jobs:
   auto_archiving:
     name: "Closed 外部Issue#${{ github.event.issue.number }}${{ github.event.inputs.issue_number }}"
     runs-on: ubuntu-latest
-    cache-mode: write
+    # 因为安全问题缓存模式特意没有设置, uv如果启用了cache功能, github action应该会告警uv缓存失败说 `token has no writable scopes`
+    # 相关文档: https://gh.io/actions-cache-mode-security
+    # This run was started by a low-trust `issues` workflow trigger and is normally restricted to read-only access to the default branch's cache scope. `cache-mode: write` overrides this secure default. If this workflow executes untrusted code, whether intentionally or due to a vulnerability, that code could poison cache entries restored by other workflows. See https://gh.io/actions-cache-mode-security.
+    # cache-mode: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -71,8 +74,10 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          enable-cache: "true"
-          cache-python: "true"
+          # github action 里 uv拉取包的速度飞快, 不用缓存也不会很慢就是了, 当然主要是上面提到的安全问题
+          # 所以这里关闭了uv的缓存功能
+          enable-cache: false
+          cache-python: false
           
       - name: Install dependencies
         run: uv sync --frozen
