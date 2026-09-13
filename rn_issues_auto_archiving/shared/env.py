@@ -1,4 +1,4 @@
-import os
+from utils.env import get_env
 
 
 class Env:
@@ -13,6 +13,7 @@ class Env:
     MANUAL_COMMENTS_URL = "MANUAL_COMMENTS_URL"
     ISSUE_URL = "ISSUE_URL"
     COMMENTS_URL = "COMMENTS_URL"
+    COMMIT_TITLE = "COMMIT_TITLE"
 
     # gitlab ci
     GITLAB_CI = "GITLAB_CI"
@@ -22,6 +23,8 @@ class Env:
     WEBHOOK_OUTPUT_PATH = "WEBHOOK_OUTPUT_PATH"
     PROJECT_ID = "PROJECT_ID"
     API_BASE_URL = "API_BASE_URL"
+    TOKEN_TTL_DAYS = "TOKEN_TTL_DAYS"
+    TARGET_VARIABLE_NAME = "TARGET_VARIABLE_NAME"
 
     # 两侧均可直接读取的环境变量
     # 或者是放仓库变量的
@@ -36,13 +39,18 @@ class Env:
     ISSUE_TYPE = "ISSUE_TYPE"
     TARGET_BRANCH = "TARGET_BRANCH"
 
+    # push_document 提交归档文件时使用
+    AUTHOR_EMAIL = "author_email"
+    AUTHOR_NAME = "author_name"
+    COMMIT_MESSAGE = "commit_message"
+
 
 def should_run_in_github_action() -> bool:
-    return os.environ.get(Env.GITHUB_ACTIONS) == "true"
+    return get_env(Env.GITHUB_ACTIONS, bool, False)
 
 
 def should_run_in_gitlab_ci() -> bool:
-    return os.environ.get(Env.GITLAB_CI) == "true"
+    return get_env(Env.GITLAB_CI, bool, False)
 
 
 def should_run_in_local() -> bool:

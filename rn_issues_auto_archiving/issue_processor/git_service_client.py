@@ -12,11 +12,13 @@ from shared.log import Log
 from shared.env import Env
 from shared.exception import *
 from shared.issue_info import AUTO_ISSUE_TYPE, IssueInfo
+from shared.send_comment import format_comment
+from utils.env import must_get_env
 from shared.issue_state import parse_issue_state
 from shared.ci_event_type import CiEventType
 from shared.json_dumps import json_dumps
 from shared.api_path import ApiPath
-from shared.json_config import Config
+from app_config import Config
 
 
 def get_issue_id_from_url(url: str) -> int:
@@ -155,7 +157,7 @@ class GitServiceClient(ABC):
             if issue_info.issue_body == "":
                 issue_info.issue_body = new_issue_info.body
 
-    def send_comment(self, comment_url: str, comment_body: str) -> None:
+    def send_comment(self, comment_url: str, comment_body: str, prefix: str) -> None:
         """api结构详见：\n
         Github ： https://docs.github.com/zh/rest/issues/comments?apiVersion=2022-11-28#create-an-issue-comment \n
         Gitlab ： https://docs.gitlab.com/ee/api/notes.html#create-new-issue-note \n
@@ -163,7 +165,9 @@ class GitServiceClient(ABC):
         """
         print(Log.sending_something.format(something=Log.announcement_comment))
         self.http_request(
-            method="POST", url=comment_url, json_content={"body": comment_body}
+            method="POST",
+            url=comment_url,
+            json_content={"body": format_comment(comment_body, prefix)},
         )
         print(Log.sending_something_success.format(something=Log.announcement_comment))
 
@@ -297,14 +301,14 @@ class GitlabClient(GitServiceClient):
         https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html#push-events
         """
         try:
-            webhook_payload = json.loads(os.environ[Env.WEBHOOK_PAYLOAD])
+            webhook_payload = json.loads(must_get_env(Env.WEBHOOK_PAYLOAD))
             if webhook_payload["event_name"] == "issue":
                 print(Log.issue_type_webhook_detected)
                 return True
             else:
                 print(Log.other_type_webhook_detected)
                 return False
-        except KeyError:
+        except (KeyError, ValueError):
             # 如果读取不到环境变量，说明是github流水线环境
             return True
 

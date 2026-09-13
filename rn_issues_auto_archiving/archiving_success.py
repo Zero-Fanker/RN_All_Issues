@@ -1,11 +1,10 @@
-import os
-
+from app_config import config
 from shared.log import Log
 from shared.issue_info import IssueInfo
-from shared.json_dumps import json_dumps
 from shared.env import Env, should_run_in_local
 from shared.send_comment import send_comment
 from issue_processor.git_service_client import GitlabClient, GithubClient
+from utils.env import must_get_env
 
 
 def main():
@@ -15,9 +14,9 @@ def main():
 
         load_dotenv()
 
-    issue_output_path = os.environ[Env.ISSUE_OUTPUT_PATH]
-    issue_repository = os.environ[Env.ISSUE_REPOSITORY]
-    token = os.environ[Env.TOKEN]
+    issue_output_path = must_get_env(Env.ISSUE_OUTPUT_PATH)
+    issue_repository = must_get_env(Env.ISSUE_REPOSITORY)
+    token = must_get_env(Env.TOKEN)
 
     issue_info: IssueInfo
     try:
@@ -48,6 +47,7 @@ def main():
             message=Log.issue_archived_success.format(
                 issue_id=issue_info.issue_id, issue_repository=issue_repository
             ),
+            prefix=config.post_comment_prefix,
         )
     except Exception as exc:
         # 归档成功评论发送失败并不重要，失败就失败了

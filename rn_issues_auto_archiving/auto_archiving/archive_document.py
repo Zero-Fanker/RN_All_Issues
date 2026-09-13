@@ -1,4 +1,6 @@
-from shared.json_config import IssueType, ProcessingActionJson
+from app_config import Config, IssueTypeStr, ProcessingActionJson
+from shared.ci_event_type import CiEventType
+from shared.issue_info import IssueInfo
 from shared.log import Log
 
 
@@ -83,7 +85,7 @@ class ArchiveDocument:
     def __parse_issue_title(
         issue_title: str,
         issue_type: str,
-        issue_title_processing_rules: dict[IssueType, ProcessingActionJson],
+        issue_title_processing_rules: dict[IssueTypeStr, ProcessingActionJson],
     ) -> str:
         action_map = issue_title_processing_rules.get(issue_type)
         if action_map is None:
@@ -135,21 +137,27 @@ class ArchiveDocument:
 
     def archive_issue(
         self,
-        rjust_space_width: int,
-        rjust_character: str,
-        table_separator: str,
-        archive_template: str,
-        fill_issue_url_by_repository_type: list[str],
-        issue_title_processing_rules: dict[IssueType, ProcessingActionJson],
-        issue_id: int,
-        issue_type: str,
-        issue_title: str,
-        issue_repository: str,
-        issue_url: str,
-        introduced_version: str,
-        archive_version: str,
-        replace_mode: bool = False,
+        archived_document: Config.ArchivedDocument,
+        issue_info: IssueInfo,
     ) -> None:
+        rjust_space_width = archived_document.rjust_space_width
+        rjust_character = archived_document.rjust_character
+        table_separator = archived_document.table_separator
+        archive_template = archived_document.archive_template
+        fill_issue_url_by_repository_type = (
+            archived_document.fill_issue_url_by_repository_type
+        )
+        issue_title_processing_rules = archived_document.issue_title_processing_rules
+
+        issue_id = issue_info.issue_id
+        issue_type = issue_info.issue_type
+        issue_title = issue_info.issue_title
+        issue_repository = issue_info.issue_repository
+        issue_url = issue_info.links.issue_web_url
+        introduced_version = issue_info.introduced_version
+        archive_version = issue_info.archive_version
+        replace_mode = issue_info.ci_event_type in CiEventType.manual
+
         print(Log.format_issue_content)
 
         if replace_mode:

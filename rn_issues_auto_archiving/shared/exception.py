@@ -8,9 +8,12 @@ class ErrorMessage:
     匹配到的版本号有：{versions}
     """
 
-    missing_archive_version = """Issue评论中找不到归档版本号关键字，请确保Issue评论中归档关键字格式正确且包含归档版本号。补全必要信息后请再次关闭Issue重新触发归档流程。
-    归档关键字格式有：{keywords}
-    """
+    missing_archive_version = """Issue评论中找不到归档版本号关键字，请确保Issue评论中归档关键字格式正确且包含归档版本号。补全必要信息后请再次关闭Issue重新触发归档流程。  
+    归档关键字格式有：
+{hints}"""
+
+    skip_archived_hint = """如果需要跳过归档流程, 请发送带有如下关键字的评论并再次关闭issue即可:
+{hints}"""
 
     too_many_archive_version = """Issue评论中匹配到多个版本号关键字，请确保Issue评论中归档关键字格式正确且只包含一个格式的归档关键字。补全必要信息后请再次关闭Issue重新触发归档流程。
     匹配到的版本号有：{versions}
@@ -48,8 +51,6 @@ class ErrorMessage:
 
     load_issue_info_failed = """读取 {issue_output_path} 失败，无法回溯Issue状态和记录失败内容，请检查相关代码，错误信息：{exc}"""
 
-    aggregation_error = """抛出聚合错误："""
-
     push_document_failed = """提交归档文档失败，错误信息：{exc}"""
 
 
@@ -77,12 +78,6 @@ class ArchiveLabelError(ArchiveBaseError):
 
 class IssueTypeError(ArchiveBaseError):
     """issue标题中缺少issue类型声明关键字等"""
-
-
-class InBlackList(ArchiveBaseError):
-    """匹配到无法继续执行归档任务的黑名单内容"""
-
-    pass
 
 
 class MissingArchiveVersionAndArchiveLabel(ArchiveBaseError):

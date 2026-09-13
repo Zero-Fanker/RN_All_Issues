@@ -1,27 +1,29 @@
 class Log:
     """日志信息"""
 
+    # internal log
+    env_not_found_or_empty = """环境变量 "{key}" 为空或者不存在"""
+    # env_value_not_valid = """环境变量 "{key}" 的值 "{value}" 不合法 , 应为 "{expected_type}" 类型而不是 "{value_type}" """
+    env_value_convert_failed = (
+        """环境变量 "{key}" 的值 "{value}" 无法转换成 "{type}" 类型"""
+    )
+    command_failed = """执行命令 "{cmd}" 失败 {code} , 错误信息: "{err_msg}" """
+
     # issue_processor
     env = "环境变量"
     issue_comment = "Issue评论"
+    skip_self_comment = """检测到本脚本发送的评论，跳过对此评论的内容匹配"""
     issue_description = "Issue描述"
     introduced_version = "引入版本号"
     archive_version = "归档版本号"
     announcement_comment = "告警评论"
-    issue_archived_comment = "归档成功评论"
-    issue_title = "Issue标题"
     issue_type = "Issue类型"
     issue_label = "Issue标签"
-    dispatch_request = "工作流调度请求"
-    uninitialized_message = "未初始化的信息"
     unknown = "Unknown"
 
     getting_something = """获取 {something} 中"""
     getting_something_from = """正在从 {another} 中获取 {something}"""
-    parse_something = """处理 {something} 中"""
     loading_something = """加载 {something} 中"""
-    config_path_not_found = """未在命令行参数中获取到配置文件路径，请正确使用"-c"或"--config"参数传入配置文件路径"""
-    parse_config_failed = """读取配置相关内容时发生错误，错误信息 ： {exc}"""
     getting_issue_info = """正在请求并获取Issue相关信息"""
     non_platform_action_env = """未检测到流水线环境，将读取".env"文件"""
     get_test_platform_type = (
@@ -40,12 +42,9 @@ class Log:
     issue_type_not_found = """未在 Issue标题 中找到 Issue类型关键字"""
     not_archive_issue = """未满足归档Issue条件，不对此Issue进行归档处理"""
     print_input_variables = """打印输入信息 ： {input_variables}"""
-    print_issue_json = """打印issue_json内容 ： 
-    {issue_json}"""
     issue_state_is_open = """Issue状态为“Open”，此issue不是归档对象"""
     issue_state_is_update = """Issue状态为“update”，此issue不是归档对象"""
     webhook_payload_not_found = """webhook payload为空，无法进行后续操作"""
-    save_issue_content_to_file = """正在将Issue内容写入至 {issue_output_path} """
     unexpected_platform_type = (
         """未知的Issue平台类型 "{platform_type}"，请检查命令行参数输入和环境变量"""
     )
@@ -70,7 +69,6 @@ class Log:
 
     getting_something_success = """获取 {something} 成功"""
     getting_something_from_success = """成功从 {another} 中获取 {something}"""
-    parse_something_success = """处理 {something} 完成"""
     loading_something_success = """加载 {something} 完毕"""
     sending_something_success = """成功发送 {something}"""
     reopen_issue_success = """重新打开Issue#{issue_number}成功"""
@@ -78,33 +76,14 @@ class Log:
     getting_issue_info_success = """成功获取Issue相关信息"""
     archive_version_found = """成功匹配评论中的 归档关键字/归档版本号"""
     target_labels_found = """成功匹配 Issue 中的 归档所需标签"""
-    issue_type_found = """成功在 Issue标题 中找到 Issue类型关键字"""
-    save_issue_content_to_file_success = "成功将 Issue内容 写入至 {issue_output_path}"
 
     # auto_archiving
     archive_document_content = """归档文件内容"""
-    non_github_action_env = """未检测到 github action 环境，将读取".env"文件"""
     print_issue_info = """打印读取到的issue_info ： {issue_info}"""
     format_issue_content = """正在格式化Issue内容"""
     write_content_to_document = """正在将内容写入归档文件"""
     time_used = """脚本总耗时：{time} s"""
     reopen_issue_request = """正在尝试发送reopen Issue请求"""
-    read_failed_recording = """正在读取归档失败记录：{failed_record_path}"""
-    failed_recording = """正在将Issue内容记录到归档失败记录"""
-    create_failed_recording = (
-        """未在 {failed_record_path} 检测到归档失败记录文件，即将创建"""
-    )
-    failed_record_json_broken = (
-        """归档失败记录损坏严重，无法读取有效内容，即将覆写 {failed_record_path}"""
-    )
-    unrecognized_issue_id = """传入了无法识别的issue_id，值为 {issue_id}"""
-    archived_failed_record_found = (
-        """在Issue错误记录中发现已完成归档的Issue：{issue_ids}"""
-    )
-    remove_failed_record_item = """正在移除归档失败记录条目：{record}"""
-    failed_record_issue_id_not_found = (
-        """无法归档失败记录条目中找到需要移除的条目，issue_id为 {issue_id}"""
-    )
     issue_id_found_in_archive_record = "发现了issue_id为 {issue_id} 的归档记录"
     issue_id_not_found_in_archive_record = "找不到issue_id为 {issue_id} 的归档记录"
     unexpected_archive_number = """匹配到无法使用的非整数的归档序号字符串，将使用归档序号默认值 {default_number} 进行归档。匹配到移仓归档序号的行内容为： {line}"""
@@ -113,21 +92,18 @@ class Log:
     replace_old_issue_record = """正在替换 "{issue_repository}#{issue_id}" 旧归档记录"""
     replaced_line_index = """替换的行号为 {line_index}"""
     add_new_line = """正在添加新行"""
-    job_down = """归档任务执行完毕"""
 
     format_issue_content_success = """格式化Issue内容成功"""
     write_content_to_document_success = """成功将内容写入归档文件"""
     reopen_issue_request_success = """reopen Issue请求成功"""
-    read_failed_recording_success = """成功读取归档失败记录：{failed_record_path}"""
-    remove_failed_record_item_success = """成功移除归档失败记录条目：{record}"""
     issue_archived_success = """{issue_repository}#{issue_id} 自动归档成功"""
 
     # push_document
     pushing_document = """正在提交归档文档"""
     pushing_document_success = """提交归档文档成功"""
     push_document_failed = """提交归档文档失败，错误信息：{exc}"""
-    issue_state_is_open_skip_push = """Issue状态为“Open”，不执行归档文件推送流程"""
-    document_not_found = """未找到归档文档，跳过推送流程"""
+    archived_document_no_change = """归档文档没有发生变化，跳过提交流程"""
+    archived_document_has_change = """归档文档发生了变化，执行提交流程"""
     issue_output_not_found_skip_push = (
         """未找到格式化的issue信息文件，不执行归档文件推送流程"""
     )

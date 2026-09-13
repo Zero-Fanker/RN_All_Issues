@@ -4,6 +4,7 @@ from dataclasses import dataclass, asdict, field
 from pathlib import Path
 import json
 
+from app_config import MatchRules, join_hints
 from shared.json_dumps import json_dumps
 from shared.log import Log
 from shared.exception import *
@@ -115,12 +116,16 @@ class IssueInfo:
 
     def should_skip_archived_process(
         self,
-        skip_archived_reges_for_comments: list[str],
+        skip_archived_reges_for_comments: list[MatchRules],
+        post_comment_prefix: str,
     ):
         comments = self.issue_comments
         for comment in comments:
-            for skip_regex in skip_archived_reges_for_comments:
-                if len(re.findall(skip_regex, comment.body)) > 0:
+            if post_comment_prefix and comment.body.startswith(post_comment_prefix):
+                print(Log.skip_self_comment)
+                continue
+            for match_rules in skip_archived_reges_for_comments:
+                if len(re.findall(match_rules.rules, comment.body)) > 0:
                     return True
         return False
 
@@ -169,7 +174,10 @@ class IssueInfo:
         return introduced_versions[0]
 
     def get_archive_version_from_comments(
-        self, comment_reges: list[str], ignore_line_reges: list[str]
+        self,
+        comment_reges: list[MatchRules],
+        ignore_line_reges: list[str],
+        post_comment_prefix: str,
     ) -> str:
         """匹配不到归档版本号会返回一个空字符串"""
         print(
@@ -181,6 +189,11 @@ class IssueInfo:
         issue_comments = self.issue_comments
         archive_versions: set[str] = set()
         for comment in issue_comments:
+            # 跳过本脚本自己发的评论，
+            # 避免把提示里出现的示例版本号当成Issue作者填写的归档版本号
+            if post_comment_prefix and comment.body.startswith(post_comment_prefix):
+                print(Log.skip_self_comment)
+                continue
             for line in comment.body.splitlines():
                 ignore_line = False
                 for ignore_line_regex in ignore_line_reges:
@@ -189,8 +202,8 @@ class IssueInfo:
                         break
                 if ignore_line:
                     continue
-                for comment_regex in comment_reges:
-                    if len(match_result := re.findall(comment_regex, line)) > 0:
+                for match_rules in comment_reges:
+                    if len(match_result := re.findall(match_rules.rules, line)) > 0:
                         archive_versions.update(match_result)
         if len(archive_versions) >= 2:
             print(Log.too_many_archive_version)
@@ -242,10 +255,10 @@ class IssueInfo:
 
     def should_archive_issue(
         self,
-        archive_version_reges_for_comments: list[str],
+        archive_version_reges_for_comments: list[MatchRules],
         archive_version_ignore_line_reges_for_comments: list[str],
-        raw_archive_version_reges_for_comments: list[str],
         archive_necessary_labels: list[str],
+        post_comment_prefix: str,
         check_labels: bool = True,
         check_archive_version: bool = True,
     ) -> bool:
@@ -260,6 +273,7 @@ class IssueInfo:
         archive_version = self.get_archive_version_from_comments(
             archive_version_reges_for_comments,
             archive_version_ignore_line_reges_for_comments,
+            post_comment_prefix,
         )
         if (
             should_not_match_archive_version := (archive_version == "")
@@ -303,7 +317,7 @@ class IssueInfo:
         if should_not_match_archive_version and check_archive_version:
             raise ArchiveVersionError(
                 ErrorMessage.missing_archive_version.format(
-                    keywords=raw_archive_version_reges_for_comments
+                    hints=join_hints(archive_version_reges_for_comments)
                 )
             )
 

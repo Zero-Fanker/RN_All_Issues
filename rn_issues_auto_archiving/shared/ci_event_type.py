@@ -1,6 +1,5 @@
-import os
-
 from shared.env import Env
+from utils.env import get_env
 
 
 class CiEventType:
@@ -13,8 +12,8 @@ class CiEventType:
 
     @staticmethod
     def should_ci_running_in_manual() -> bool:
-        return os.environ.get(Env.CI_EVENT_TYPE) in CiEventType.manual
+        return get_env(Env.CI_EVENT_TYPE) in CiEventType.manual
 
     @staticmethod
     def should_ci_running_in_issue_event() -> bool:
-        return os.environ.get(Env.CI_EVENT_TYPE) in CiEventType.issue_event
+        return get_env(Env.CI_EVENT_TYPE) in CiEventType.issue_event

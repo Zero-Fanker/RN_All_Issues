@@ -1,6 +1,5 @@
-import os
-from abc import ABC, abstractmethod
 import json
+from abc import ABC, abstractmethod
 
 from shared.issue_info import IssueInfo, AUTO_ISSUE_TYPE
 from shared.ci_event_type import CiEventType
@@ -10,6 +9,7 @@ from shared.issue_state import parse_issue_state
 from shared.json_dumps import json_dumps
 from shared.exception import MissingIssueNumber, WebhookPayloadError
 from shared.api_path import ApiPath
+from utils.env import get_env, must_get_env
 
 
 def issue_number_to_int(issue_number: str):
@@ -30,25 +30,25 @@ class GithubIssueDataSource(IssusDataSource):
     def load(self, issue_info: IssueInfo) -> None:
         print(Log.loading_something.format(something=Log.env))
 
-        issue_info.ci_event_type = ci_event_type = os.environ[Env.CI_EVENT_TYPE]
-        issue_info.issue_repository = os.environ[Env.ISSUE_REPOSITORY]
+        issue_info.ci_event_type = ci_event_type = must_get_env(Env.CI_EVENT_TYPE)
+        issue_info.issue_repository = must_get_env(Env.ISSUE_REPOSITORY)
 
         # 手动触发流水线时应该读取的环境变量
         if ci_event_type in CiEventType.manual:
             issue_info.issue_id = issue_number_to_int(
-                os.environ[Env.MANUAL_ISSUE_NUMBER]
+                must_get_env(Env.MANUAL_ISSUE_NUMBER)
             )
-            issue_info.issue_title = os.environ[Env.MANUAL_ISSUE_TITLE].strip()
+            issue_info.issue_title = get_env(Env.MANUAL_ISSUE_TITLE, str, "").strip()
             issue_info.issue_state = parse_issue_state(
-                os.environ[Env.MANUAL_ISSUE_STATE]
+                must_get_env(Env.MANUAL_ISSUE_STATE)
             )
             issue_info.issue_body = ""
             issue_info.issue_labels = []
-            issue_info.introduced_version = os.environ[Env.INTRODUCED_VERSION].strip()
-            issue_info.archive_version = os.environ[Env.ARCHIVE_VERSION].strip()
-            issue_info.issue_type = os.environ[Env.ISSUE_TYPE]
-            issue_info.links.issue_url = os.environ[Env.MANUAL_ISSUE_URL]
-            issue_info.links.comment_url = os.environ[Env.MANUAL_COMMENTS_URL]
+            issue_info.introduced_version = get_env(Env.INTRODUCED_VERSION, str, "")
+            issue_info.archive_version = get_env(Env.ARCHIVE_VERSION, str, "")
+            issue_info.issue_type = get_env(Env.ISSUE_TYPE, str, "")
+            issue_info.links.issue_url = must_get_env(Env.MANUAL_ISSUE_URL)
+            issue_info.links.comment_url = must_get_env(Env.MANUAL_COMMENTS_URL)
 
             print(
                 Log.print_input_variables.format(
@@ -66,16 +66,16 @@ class GithubIssueDataSource(IssusDataSource):
 
         # 自动触发流水线时应该读取的环境变量
         else:
-            issue_info.issue_id = int(os.environ[Env.ISSUE_NUMBER])
-            issue_info.issue_title = os.environ[Env.ISSUE_TITLE]
-            issue_info.issue_state = parse_issue_state(os.environ[Env.ISSUE_STATE])
-            issue_info.issue_body = os.environ[Env.ISSUE_BODY]
+            issue_info.issue_id = must_get_env(Env.ISSUE_NUMBER, int)
+            issue_info.issue_title = get_env(Env.ISSUE_TITLE, str, "")
+            issue_info.issue_state = parse_issue_state(must_get_env(Env.ISSUE_STATE))
+            issue_info.issue_body = get_env(Env.ISSUE_BODY, str, "")
             issue_info.issue_labels = []
             issue_info.introduced_version = ""
             issue_info.archive_version = ""
             issue_info.issue_type = AUTO_ISSUE_TYPE
-            issue_info.links.issue_url = os.environ[Env.ISSUE_URL]
-            issue_info.links.comment_url = os.environ[Env.COMMENTS_URL]
+            issue_info.links.issue_url = must_get_env(Env.ISSUE_URL)
+            issue_info.links.comment_url = must_get_env(Env.COMMENTS_URL)
 
         print(Log.loading_something_success.format(something=Log.env))
 
@@ -88,29 +88,25 @@ class GitlabIssueDataSource(IssusDataSource):
     def load(self, issue_info: IssueInfo) -> None:
         print(Log.loading_something.format(something=Log.env))
 
-        issue_info.ci_event_type = ci_event_type = os.environ[Env.CI_EVENT_TYPE]
-        issue_info.issue_repository = os.environ[Env.ISSUE_REPOSITORY]
+        issue_info.ci_event_type = ci_event_type = must_get_env(Env.CI_EVENT_TYPE)
+        issue_info.issue_repository = must_get_env(Env.ISSUE_REPOSITORY)
 
         # 手动触发流水线时应该读取的环境变量
         issue_id: int
         if ci_event_type in CiEventType.manual:
-            issue_id_str = os.environ.get(Env.ISSUE_NUMBER, None)
+            issue_id_str = get_env(Env.ISSUE_NUMBER, str, None)
             if issue_id_str is None or issue_id_str == "":
                 raise MissingIssueNumber(
                     Log.missing_issue_number.format(issues_number_var=Env.ISSUE_NUMBER)
                 )
             issue_info.issue_id = issue_id = issue_number_to_int(issue_id_str)
-            issue_info.issue_title = os.environ.get(Env.ISSUE_TITLE, "").strip()
-            issue_info.issue_state = parse_issue_state(os.environ[Env.ISSUE_STATE])
+            issue_info.issue_title = get_env(Env.ISSUE_TITLE, str, "").strip()
+            issue_info.issue_state = parse_issue_state(must_get_env(Env.ISSUE_STATE))
             issue_info.issue_body = ""
             issue_info.issue_labels = []
-            issue_info.introduced_version = os.environ.get(
-                Env.INTRODUCED_VERSION, ""
-            ).strip()
-            issue_info.archive_version = os.environ.get(Env.ARCHIVE_VERSION, "").strip()
-            issue_info.issue_type = os.environ.get(
-                Env.ISSUE_TYPE, AUTO_ISSUE_TYPE
-            ).strip()
+            issue_info.introduced_version = get_env(Env.INTRODUCED_VERSION, str, "")
+            issue_info.archive_version = get_env(Env.ARCHIVE_VERSION, str, "")
+            issue_info.issue_type = get_env(Env.ISSUE_TYPE, str, AUTO_ISSUE_TYPE)
 
             print(
                 Log.print_input_variables.format(
@@ -129,7 +125,7 @@ class GitlabIssueDataSource(IssusDataSource):
         # 自动触发流水线时应该读取的环境变量
         else:
             try:
-                webhook_payload = json.loads(os.environ[Env.WEBHOOK_PAYLOAD])
+                webhook_payload = json.loads(get_env(Env.WEBHOOK_PAYLOAD, str, ""))
             except Exception:
                 print(Log.webhook_payload_not_found)
                 raise WebhookPayloadError(Log.webhook_payload_not_found)
@@ -149,7 +145,7 @@ class GitlabIssueDataSource(IssusDataSource):
             issue_info.archive_version = ""
             issue_info.issue_type = AUTO_ISSUE_TYPE
 
-        issue_url = self.build_issue_url(issue_id, os.environ[Env.API_BASE_URL])
+        issue_url = self.build_issue_url(issue_id, must_get_env(Env.API_BASE_URL))
         issue_info.links.issue_url = issue_url
         issue_info.links.comment_url = issue_url + "/" + ApiPath.notes
 
