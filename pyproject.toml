@@ -6,7 +6,6 @@ requires-python = ">=3.10"
 version = "0.1.0"
 dependencies = [
   "httpx>=0.28.1",
-  "json-repair>=0.52.3",
 ]
 
 [tool.setuptools]
