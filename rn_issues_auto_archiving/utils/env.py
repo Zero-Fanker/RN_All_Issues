@@ -5,9 +5,10 @@ from shared.log import Log
 
 
 T1 = TypeVar("T1")
+T2 = TypeVar("T2")
 
 
-def get_env(key: str, type: type[T1] = str, default: Any | None = None) -> T1 | Any:
+def get_env(key: str, type: type[T1] = str, default: T2 = None) -> T1 | T2:
     result = os.getenv(key)
     if result is None or result.strip() == "":
         return default
@@ -32,7 +33,7 @@ def get_env(key: str, type: type[T1] = str, default: Any | None = None) -> T1 | 
         ) from exc
 
 
-def must_get_env(key: str, type: type[T1] = str) -> T1 | Any:
+def must_get_env(key: str, type: type[T1] = str) -> T1:
     result = get_env(key, type, None)
     if result is None:
         raise ValueError(Log.env_not_found_or_empty.format(key=key))
